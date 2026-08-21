@@ -49,13 +49,15 @@ describe('pickNextWord', () => {
   })
 
   it('excludes mastered words when unmastered words remain', () => {
-    const mastered = ['CAT', 'DOG', 'SUN']
+    const allWords = vocabData.level_1.words
+    const lastWord = allWords[allWords.length - 1]
+    const mastered = allWords.slice(0, -1)
     const word = pickNextWord('level_1', mastered, vocabData)
-    expect(word).toBe('HAT') // only unmastered word left in level_1
+    expect(word).toBe(lastWord)
   })
 
   it('falls back to the full pool if all words in tier are mastered', () => {
-    const mastered = ['CAT', 'DOG', 'SUN', 'HAT']
+    const mastered = [...vocabData.level_1.words]
     const word = pickNextWord('level_1', mastered, vocabData)
     expect(vocabData.level_1.words).toContain(word)
   })

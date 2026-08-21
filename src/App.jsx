@@ -54,7 +54,7 @@ const keyboardMap = [
   { name: 'backward', keys: ['KeyS', 'ArrowDown'] },
   { name: 'leftward', keys: ['KeyA', 'ArrowLeft'] },
   { name: 'rightward', keys: ['KeyD', 'ArrowRight'] },
-  { name: 'jump', keys: ['Space'] },
+  { name: 'jump', keys: ['Space', 'KeyJ', 'KeyK', 'KeyE', 'KeyZ', 'KeyC', 'Numpad0'] },
   { name: 'run', keys: ['ShiftLeft', 'ShiftRight'] },
 ]
 

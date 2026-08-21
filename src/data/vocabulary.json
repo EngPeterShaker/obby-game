@@ -1,14 +1,14 @@
 {
   "level_1": {
     "tierReward": { "type": "color", "value": "blue" },
-    "words": ["CAT", "DOG", "SUN", "HAT"]
+    "words": ["CAT", "DOG", "SUN", "HAT", "ONE", "TWO", "SIX", "TEN"]
   },
   "level_2": {
     "tierReward": { "type": "trail", "value": "orange" },
-    "words": ["JUMP", "FAST", "BIRD", "STAR"]
+    "words": ["JUMP", "FAST", "BIRD", "STAR", "FOUR", "FIVE", "NINE"]
   },
   "level_3": {
     "tierReward": { "type": "color", "value": "gold" },
-    "words": ["SPACE", "ROCKET", "PLANET"]
+    "words": ["SPACE", "ROCKET", "PLANET", "THREE", "SEVEN", "EIGHT"]
   }
 }
