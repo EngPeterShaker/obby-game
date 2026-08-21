@@ -6,10 +6,71 @@ function WordProgressHUD() {
   const targetWord = useGameStore((state) => state.targetWord)
   const inventory = useGameStore((state) => state.inventory)
   const cognitiveStrikes = useGameStore((state) => state.cognitiveStrikes)
-  const currentTier = useGameStore((state) => state.currentTier)
+
+  const [isRevealed, setIsRevealed] = useState(true)
+  const [peekCountdown, setPeekCountdown] = useState(null)
+  const hideTimerRef = useRef(null)
+  const countdownIntervalRef = useRef(null)
 
   const nextLetterIndex = inventory.length
   const nextLetter = targetWord[nextLetterIndex]
+
+  // Reveal for 3 seconds on new target word
+  useEffect(() => {
+    setIsRevealed(true)
+    setPeekCountdown(3)
+
+    if (hideTimerRef.current) clearTimeout(hideTimerRef.current)
+    if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current)
+
+    let remaining = 3
+    countdownIntervalRef.current = setInterval(() => {
+      remaining -= 1
+      if (remaining <= 0) {
+        clearInterval(countdownIntervalRef.current)
+        setPeekCountdown(null)
+      } else {
+        setPeekCountdown(remaining)
+      }
+    }, 1000)
+
+    hideTimerRef.current = setTimeout(() => {
+      setIsRevealed(false)
+      setPeekCountdown(null)
+    }, 3000)
+
+    return () => {
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current)
+      if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current)
+    }
+  }, [targetWord])
+
+  // Handle 2-second peek button
+  const handlePeek = () => {
+    if (isRevealed && peekCountdown !== null) return // Already peeking
+
+    setIsRevealed(true)
+    setPeekCountdown(2)
+
+    if (hideTimerRef.current) clearTimeout(hideTimerRef.current)
+    if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current)
+
+    let remaining = 2
+    countdownIntervalRef.current = setInterval(() => {
+      remaining -= 1
+      if (remaining <= 0) {
+        clearInterval(countdownIntervalRef.current)
+        setPeekCountdown(null)
+      } else {
+        setPeekCountdown(remaining)
+      }
+    }, 1000)
+
+    hideTimerRef.current = setTimeout(() => {
+      setIsRevealed(false)
+      setPeekCountdown(null)
+    }, 2000)
+  }
 
   return (
     <div style={{
@@ -20,18 +81,18 @@ function WordProgressHUD() {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      gap: '0.4rem',
+      gap: '0.5rem',
       pointerEvents: 'none',
       zIndex: 10,
     }}>
       {/* Target Word Container */}
       <div style={{
-        background: 'rgba(0, 0, 0, 0.75)',
+        background: 'rgba(0, 0, 0, 0.85)',
         backdropFilter: 'blur(8px)',
-        padding: '0.6rem 1.4rem',
-        borderRadius: '1rem',
+        padding: '0.7rem 1.5rem',
+        borderRadius: '1.2rem',
         border: '2px solid rgba(255, 255, 255, 0.2)',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -43,8 +104,32 @@ function WordProgressHUD() {
           letterSpacing: '0.1rem',
           textTransform: 'uppercase',
           marginBottom: '0.3rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.4rem',
         }}>
-          🎯 Goal: Spell the Word
+          <span>🎯 Target Word</span>
+          {isRevealed ? (
+            <span style={{
+              background: '#22c55e',
+              color: 'white',
+              fontSize: '0.72rem',
+              padding: '0.1rem 0.4rem',
+              borderRadius: '0.3rem',
+            }}>
+              {peekCountdown ? `Visible (${peekCountdown}s)` : 'Visible'}
+            </span>
+          ) : (
+            <span style={{
+              background: '#6b7280',
+              color: 'white',
+              fontSize: '0.72rem',
+              padding: '0.1rem 0.4rem',
+              borderRadius: '0.3rem',
+            }}>
+              Hidden
+            </span>
+          )}
         </div>
 
         {/* Letter Boxes */}
@@ -57,65 +142,102 @@ function WordProgressHUD() {
               <div
                 key={index}
                 style={{
-                  width: '2.8rem',
-                  height: '3.2rem',
-                  borderRadius: '0.6rem',
+                  width: '3rem',
+                  height: '3.4rem',
+                  borderRadius: '0.7rem',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'center',
                   alignItems: 'center',
                   fontWeight: '900',
-                  fontSize: '1.6rem',
+                  fontSize: '1.7rem',
                   fontFamily: 'monospace',
                   transition: 'all 0.3s ease',
                   backgroundColor: isCollected
                     ? '#16a34a'
-                    : isNext
+                    : isNext && isRevealed
                     ? '#eab308'
-                    : '#374151',
-                  color: isCollected || isNext ? '#ffffff' : '#9ca3af',
-                  border: isNext
+                    : isRevealed
+                    ? '#374151'
+                    : '#1f2937',
+                  color: isCollected || (isRevealed && isNext) ? '#ffffff' : isRevealed ? '#9ca3af' : '#6b7280',
+                  border: isNext && isRevealed
                     ? '3px solid #ffffff'
                     : isCollected
                     ? '2px solid #86efac'
-                    : '2px solid #4b5563',
-                  transform: isNext ? 'scale(1.1)' : 'scale(1)',
-                  boxShadow: isNext ? '0 0 16px rgba(234, 179, 8, 0.8)' : 'none',
+                    : isRevealed
+                    ? '2px solid #4b5563'
+                    : '2px dashed #4b5563',
+                  transform: isNext && isRevealed ? 'scale(1.1)' : 'scale(1)',
+                  boxShadow: isNext && isRevealed ? '0 0 16px rgba(234, 179, 8, 0.8)' : 'none',
                 }}
               >
-                {isCollected ? inventory[index] : char}
+                {isCollected ? inventory[index] : isRevealed ? char : '?'}
               </div>
             )
           })}
         </div>
 
-        {/* Hint Prompt */}
-        {nextLetter && (
-          <div style={{
-            marginTop: '0.5rem',
-            color: '#fef08a',
-            fontSize: '0.9rem',
-            fontWeight: '600',
-          }}>
-            Collect letter: <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#ffffff' }}>"{nextLetter}"</span> (avoid decoys!)
-          </div>
-        )}
+        {/* Hint or Hidden Notice */}
+        <div style={{
+          marginTop: '0.5rem',
+          fontSize: '0.88rem',
+          fontWeight: '600',
+          color: isRevealed ? '#fef08a' : '#9ca3af',
+        }}>
+          {isRevealed && nextLetter ? (
+            <span>Collect letter: <strong style={{ fontSize: '1.1rem', color: '#ffffff' }}>"{nextLetter}"</strong></span>
+          ) : (
+            <span>🧠 Hidden! Remember the word or tap Peek below</span>
+          )}
+        </div>
       </div>
 
-      {/* Strikes Meter */}
-      <div style={{
-        background: 'rgba(0, 0, 0, 0.6)',
-        padding: '0.3rem 0.8rem',
-        borderRadius: '0.8rem',
-        color: '#f87171',
-        fontSize: '0.85rem',
-        fontWeight: 'bold',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.3rem',
-      }}>
-        <span>Strikes (max 3):</span>
-        <span>{cognitiveStrikes === 0 ? '💚 0/3' : cognitiveStrikes === 1 ? '⚠️ 1/3' : '🚨 2/3'}</span>
+      {/* Peek Button & Strikes in Row */}
+      <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', pointerEvents: 'auto' }}>
+        {/* Peek Button */}
+        <button
+          onClick={handlePeek}
+          style={{
+            background: isRevealed
+              ? 'rgba(234, 179, 8, 0.9)'
+              : 'rgba(0, 0, 0, 0.75)',
+            backdropFilter: 'blur(8px)',
+            border: '2px solid #fbbf24',
+            color: isRevealed ? '#000000' : '#fbbf24',
+            padding: '0.35rem 0.9rem',
+            borderRadius: '0.8rem',
+            fontSize: '0.88rem',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+            boxShadow: isRevealed ? '0 0 14px rgba(234, 179, 8, 0.6)' : '0 4px 12px rgba(0,0,0,0.4)',
+            transition: 'all 0.2s ease',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.35rem',
+          }}
+        >
+          <span>💡</span>
+          <span>{isRevealed && peekCountdown ? `Showing (${peekCountdown}s)` : 'Peek Word (2s)'}</span>
+        </button>
+
+        {/* Strikes Meter */}
+        <div style={{
+          background: 'rgba(0, 0, 0, 0.75)',
+          backdropFilter: 'blur(8px)',
+          padding: '0.35rem 0.8rem',
+          borderRadius: '0.8rem',
+          border: '1px solid rgba(255,255,255,0.15)',
+          color: '#f87171',
+          fontSize: '0.85rem',
+          fontWeight: 'bold',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.3rem',
+        }}>
+          <span>Strikes:</span>
+          <span>{cognitiveStrikes === 0 ? '💚 0/3' : cognitiveStrikes === 1 ? '⚠️ 1/3' : '🚨 2/3'}</span>
+        </div>
       </div>
     </div>
   )
