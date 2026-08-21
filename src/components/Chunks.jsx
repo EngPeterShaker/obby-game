@@ -1,6 +1,5 @@
 import * as THREE from 'three'
 import { RigidBody, CuboidCollider } from '@react-three/rapier'
-import { Text, Billboard } from '@react-three/drei'
 import { Collectible } from './Collectible.jsx'
 import { useGameStore } from '../store/gameStore.js'
 
@@ -170,20 +169,6 @@ export function GapChunk({ position, chunk }) {
       {/* Glowing Molten Lava in the bottom of the gap */}
       <mesh geometry={lavaGeometry} material={lavaMaterial} rotation={[-Math.PI / 2, 0, 0]} position={[0, -4, 0]} />
       <mesh geometry={lavaGlowGeometry} material={lavaGlowMaterial} rotation={[-Math.PI / 2, 0, 0]} position={[0, -3.5, 0]} />
-
-      {/* Floating Neon Warning Banner above the gap */}
-      <Billboard position={[0, 2.5, 0]}>
-        <Text
-          fontSize={0.85}
-          color="#fde047"
-          anchorX="center"
-          anchorY="middle"
-          outlineWidth={0.08}
-          outlineColor="#78350f"
-        >
-          ⚠️ JUMP! ⚠️
-        </Text>
-      </Billboard>
 
       {/* Front Platform (Z = +3.4) */}
       <RigidBody type="fixed" position={[0, 0, 3.4]} colliders="cuboid" userData={{ isFloor: true }}>
