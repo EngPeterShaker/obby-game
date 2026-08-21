@@ -11,6 +11,8 @@ import { LobbyUI } from './components/LobbyUI.jsx'
 import { ControlsModal } from './components/ControlsModal.jsx'
 import { SettingsModal } from './components/SettingsModal.jsx'
 import { SkyHazards } from './components/SkyHazards.jsx'
+import { LandscapeGuard } from './components/LandscapeGuard.jsx'
+import { AdaptiveCameraScaler } from './components/AdaptiveCameraScaler.jsx'
 import { useGameStore } from './store/gameStore.js'
 
 const NORMAL_SKY_COLOR = '#87ceeb'
@@ -66,8 +68,10 @@ export default function App() {
 
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+      <LandscapeGuard />
       <KeyboardControls map={keyboardMap}>
         <Canvas camera={{ position: [0, 5, 10], fov: 50 }} shadows>
+          <AdaptiveCameraScaler />
           <SafeModeBackground />
           <ambientLight intensity={0.5} />
           <directionalLight position={[10, 10, 5]} castShadow />
