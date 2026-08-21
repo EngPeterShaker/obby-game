@@ -202,6 +202,60 @@ export function SettingsModal() {
                   }} />
                 </div>
               </div>
+
+              {/* Fullscreen Toggle Card */}
+              <div
+                onClick={() => {
+                  if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(() => {})
+                    if (screen.orientation && screen.orientation.lock) {
+                      screen.orientation.lock('landscape').catch(() => {})
+                    }
+                  } else {
+                    document.exitFullscreen().catch(() => {})
+                  }
+                }}
+                style={{
+                  backgroundColor: '#111827',
+                  border: '1px solid #374151',
+                  borderRadius: '0.8rem',
+                  padding: '0.9rem 1.1rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginTop: '0.6rem',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                <div style={{ paddingRight: '1rem' }}>
+                  <div style={{
+                    fontWeight: 'bold',
+                    fontSize: '1rem',
+                    color: '#ffffff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                  }}>
+                    <span>⛶ Fullscreen App Mode</span>
+                  </div>
+                  <div style={{ fontSize: '0.82rem', color: '#9ca3af', marginTop: '0.25rem' }}>
+                    Enter edge-to-edge fullscreen and hide browser navigation bars.
+                  </div>
+                </div>
+
+                <div style={{
+                  background: '#38bdf8',
+                  color: '#0f172a',
+                  fontWeight: 'bold',
+                  fontSize: '0.85rem',
+                  padding: '0.4rem 0.8rem',
+                  borderRadius: '0.5rem',
+                  whiteSpace: 'nowrap',
+                }}>
+                  Toggle ⛶
+                </div>
+              </div>
             </div>
 
             {/* Camera Presets Section */}

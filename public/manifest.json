@@ -1,0 +1,19 @@
+{
+  "name": "Obby Word Runner",
+  "short_name": "Obby Game",
+  "description": "3D Spelling Obby Platformer Game",
+  "start_url": "/",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone", "minimal-ui"],
+  "orientation": "landscape",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
