@@ -58,8 +58,11 @@ export function LobbyUI() {
         pointerEvents: 'auto',
         display: 'flex',
         flexDirection: 'column',
-        gap: '1rem',
+        gap: '0.8rem',
         maxWidth: '340px',
+        maxHeight: 'calc(100vh - 14rem)',
+        overflowY: 'auto',
+        paddingRight: '0.4rem',
       }}>
         {/* Colors Panel */}
         <div style={{
