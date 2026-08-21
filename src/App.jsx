@@ -1,8 +1,9 @@
 import { Canvas } from '@react-three/fiber'
-import { Physics, RigidBody } from '@react-three/rapier'
+import { Physics } from '@react-three/rapier'
 import { KeyboardControls } from '@react-three/drei'
 import { Player } from './components/Player.jsx'
 import { OverlayUI } from './components/OverlayUI.jsx'
+import { LevelManager } from './components/LevelManager.jsx'
 
 // ecctrl@1.0.82 confirmed action names (Task 4 investigation, from ecctrl's
 // own readme.md): 'leftward' / 'rightward', NOT 'left' / 'right'.
@@ -23,17 +24,7 @@ export default function App() {
           <ambientLight intensity={0.5} />
           <directionalLight position={[10, 10, 5]} castShadow />
           <Physics gravity={[0, -9.81, 0]}>
-            {/* Temporary flat test floor for the player controller — Task 9
-                replaces this with <LevelManager>. Wrapped in a fixed
-                RigidBody so it actually has a collider: a bare <mesh> inside
-                <Physics> with no <RigidBody> gets no physics body at all,
-                and the player would fall straight through. */}
-            <RigidBody type="fixed" colliders="cuboid">
-              <mesh position={[0, -0.5, 0]} receiveShadow>
-                <boxGeometry args={[50, 1, 50]} />
-                <meshStandardMaterial color="gray" />
-              </mesh>
-            </RigidBody>
+            <LevelManager />
             <Player />
           </Physics>
         </Canvas>

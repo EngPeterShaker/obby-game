@@ -29,10 +29,10 @@ export const useGameStore = create((set, get) => ({
     mechanicalDeaths: state.mechanicalDeaths + 1,
   })),
 
-  // Note: restart() does not yet call spawnInitialChunks() — that action is
-  // added in Task 9 once chunks exist. This task's restart only handles
-  // gameState/inventory; Task 9 extends it.
-  restart: () => set({ gameState: 'playing', inventory: [] }),
+  restart: () => {
+    set({ gameState: 'playing', inventory: [] })
+    get().spawnInitialChunks()
+  },
 
   spawnInitialChunks: () => set(() => {
     const chunks = Array.from({ length: 10 }, (_, i) => ({
