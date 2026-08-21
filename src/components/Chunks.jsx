@@ -49,13 +49,16 @@ function SafetyBumpers() {
 
 export function BasicChunk({ position, chunk }) {
   const isSafeMode = useGameStore((state) => state.mechanicalDeaths >= 6)
-  const [x, y, z] = position
 
   return (
     <RigidBody type="fixed" position={position} colliders="cuboid">
       <mesh geometry={floorGeometry} material={floorMaterial} receiveShadow />
       {chunk?.hasLetter && (
-        <Collectible letter={chunk.letter} position={[x, y + 1.5, z]} />
+        // Local offset: the parent RigidBody above is already at the
+        // chunk's world position [x, y, z], so this Collectible's own
+        // nested RigidBody (see Collectible.jsx) composes parent x child
+        // transforms. Passing world coordinates here would double them.
+        <Collectible letter={chunk.letter} position={[0, 1.5, 0]} />
       )}
       {isSafeMode && <SafetyBumpers />}
     </RigidBody>
