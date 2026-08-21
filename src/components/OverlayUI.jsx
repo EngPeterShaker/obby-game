@@ -89,33 +89,33 @@ function WordProgressHUD() {
       <div style={{
         background: 'rgba(0, 0, 0, 0.82)',
         backdropFilter: 'blur(8px)',
-        padding: 'clamp(0.4rem, 1.2vw, 0.65rem) clamp(0.7rem, 2vw, 1.1rem)',
-        borderRadius: '1rem',
+        padding: 'clamp(0.35rem, 0.9vw, 0.5rem) clamp(0.5rem, 1.4vw, 0.85rem)',
+        borderRadius: '0.8rem',
         border: '2px solid rgba(255, 255, 255, 0.2)',
-        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
+        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.5)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'flex-start',
       }}>
         <div style={{
           color: '#fbbf24',
-          fontSize: '0.8rem',
+          fontSize: '0.75rem',
           fontWeight: 'bold',
-          letterSpacing: '0.08rem',
+          letterSpacing: '0.06rem',
           textTransform: 'uppercase',
-          marginBottom: '0.25rem',
+          marginBottom: '0.2rem',
           display: 'flex',
           alignItems: 'center',
-          gap: '0.4rem',
+          gap: '0.35rem',
         }}>
           <span>🎯 Target Word</span>
           {isRevealed ? (
             <span style={{
               background: '#22c55e',
               color: 'white',
-              fontSize: '0.7rem',
-              padding: '0.08rem 0.35rem',
-              borderRadius: '0.3rem',
+              fontSize: '0.65rem',
+              padding: '0.06rem 0.3rem',
+              borderRadius: '0.25rem',
             }}>
               {peekCountdown ? `Visible (${peekCountdown}s)` : 'Visible'}
             </span>
@@ -123,9 +123,9 @@ function WordProgressHUD() {
             <span style={{
               background: '#6b7280',
               color: 'white',
-              fontSize: '0.7rem',
-              padding: '0.08rem 0.35rem',
-              borderRadius: '0.3rem',
+              fontSize: '0.65rem',
+              padding: '0.06rem 0.3rem',
+              borderRadius: '0.25rem',
             }}>
               Hidden
             </span>
@@ -133,7 +133,7 @@ function WordProgressHUD() {
         </div>
 
         {/* Letter Boxes */}
-        <div style={{ display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
           {targetWord.split('').map((char, index) => {
             const isCollected = index < inventory.length
             const isNext = index === nextLetterIndex
@@ -142,15 +142,15 @@ function WordProgressHUD() {
               <div
                 key={index}
                 style={{
-                  width: 'clamp(2.2rem, 5.5vw, 2.8rem)',
-                  height: 'clamp(2.5rem, 6.5vw, 3.2rem)',
-                  borderRadius: '0.55rem',
+                  width: 'clamp(1.6rem, 3.4vw, 2.3rem)',
+                  height: 'clamp(1.9rem, 4.0vw, 2.6rem)',
+                  borderRadius: '0.45rem',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'center',
                   alignItems: 'center',
                   fontWeight: '900',
-                  fontSize: 'clamp(1.2rem, 3.5vw, 1.55rem)',
+                  fontSize: 'clamp(0.95rem, 2.2vw, 1.3rem)',
                   fontFamily: 'monospace',
                   transition: 'all 0.3s ease',
                   backgroundColor: isCollected
@@ -162,14 +162,14 @@ function WordProgressHUD() {
                     : '#1f2937',
                   color: isCollected || (isRevealed && isNext) ? '#ffffff' : isRevealed ? '#9ca3af' : '#6b7280',
                   border: isNext && isRevealed
-                    ? '3px solid #ffffff'
+                    ? '2px solid #ffffff'
                     : isCollected
                     ? '2px solid #86efac'
                     : isRevealed
-                    ? '2px solid #4b5563'
-                    : '2px dashed #4b5563',
+                    ? '1.5px solid #4b5563'
+                    : '1.5px dashed #4b5563',
                   transform: isNext && isRevealed ? 'scale(1.08)' : 'scale(1)',
-                  boxShadow: isNext && isRevealed ? '0 0 14px rgba(234, 179, 8, 0.8)' : 'none',
+                  boxShadow: isNext && isRevealed ? '0 0 10px rgba(234, 179, 8, 0.8)' : 'none',
                 }}
               >
                 {isCollected ? inventory[index] : isRevealed ? char : '?'}

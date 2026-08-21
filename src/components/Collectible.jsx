@@ -48,11 +48,11 @@ export function Collectible({ letter, position }) {
         <group ref={floatGroupRef}>
           <Billboard>
             <Text
-              fontSize={1.8}
+              fontSize={1.15}
               color="#ffd700"
               anchorX="center"
               anchorY="middle"
-              outlineWidth={0.1}
+              outlineWidth={0.07}
               outlineColor="#4a2500"
               material-side={THREE.DoubleSide}
             >
@@ -60,8 +60,8 @@ export function Collectible({ letter, position }) {
             </Text>
           </Billboard>
           {/* Subtle glowing ring underneath the floating letter */}
-          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.6, 0]}>
-            <ringGeometry args={[0.5, 0.75, 32]} />
+          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.45, 0]}>
+            <ringGeometry args={[0.35, 0.55, 32]} />
             <meshBasicMaterial color="#ffd700" side={THREE.DoubleSide} transparent opacity={0.6} />
           </mesh>
         </group>
