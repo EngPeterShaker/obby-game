@@ -1,8 +1,11 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import { getChunkWeights, pickChunkType, applyCognitiveStrike, pickNextWord, getTierRewardAction } from './gameStore.logic.js'
 import vocabData from '../data/vocabulary.json'
 
-export const useGameStore = create((set, get) => ({
+export const useGameStore = create(
+  persist(
+    (set, get) => ({
   // Reactive UI state
   gameState: 'lobby', // 'lobby' | 'playing' | 'dead' | 'won'
   inventory: [],
@@ -120,4 +123,18 @@ export const useGameStore = create((set, get) => ({
     // Correct letter, word not yet finished — THE FIX: strikes reset here too
     return { inventory: newInventory, cognitiveStrikes: 0 }
   }),
-}))
+    }),
+    {
+      name: 'obby-save-data',
+      partialize: (state) => ({
+        unlockedColors: state.unlockedColors,
+        equippedColor: state.equippedColor,
+        unlockedTrails: state.unlockedTrails,
+        equippedTrail: state.equippedTrail,
+        masteredWords: state.masteredWords,
+        totalCoins: state.totalCoins,
+        currentTier: state.currentTier,
+      }),
+    }
+  )
+)
