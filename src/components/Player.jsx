@@ -27,6 +27,7 @@ export function Player() {
   const equippedTrail = useGameStore((state) => state.equippedTrail)
   const prevVelYRef = useRef(0)
   const prevJumpRef = useRef(false)
+  const respawnTimeRef = useRef(0)
   const [dustActive, setDustActive] = useState(false)
   const [isMoving, setIsMoving] = useState(false)
   const dustRearmTimeoutRef = useRef(null)
@@ -37,7 +38,9 @@ export function Player() {
     const { y, z } = rigidBodyRef.current.translation()
     useGameStore.getState().playerZ = z
 
-    if (gameState === 'playing' && y < -10) {
+    // Death check with grace period to eliminate respawn race condition
+    const now = performance.now()
+    if (gameState === 'playing' && y < -10 && (now - respawnTimeRef.current > 800)) {
       useGameStore.getState().die()
     }
 
@@ -71,11 +74,19 @@ export function Player() {
     prevVelYRef.current = velY
   })
 
-  // Respawn: teleport the rigid body back to the spawn point and zero velocity
+  // Instant Reset: teleport and zero velocity on death or respawn
   useEffect(() => {
-    if (gameState === 'playing' && rigidBodyRef.current) {
-      rigidBodyRef.current.setTranslation({ x: 0, y: 5, z: 0 }, true)
-      rigidBodyRef.current.setLinvel({ x: 0, y: 0, z: 0 }, true)
+    if (rigidBodyRef.current) {
+      if (gameState === 'playing') {
+        respawnTimeRef.current = performance.now()
+        rigidBodyRef.current.setTranslation({ x: 0, y: 5, z: 0 }, true)
+        rigidBodyRef.current.setLinvel({ x: 0, y: 0, z: 0 }, true)
+        rigidBodyRef.current.setAngvel({ x: 0, y: 0, z: 0 }, true)
+      } else if (gameState === 'dead') {
+        // Freeze falling immediately on death so the body isn't at y = -200
+        rigidBodyRef.current.setLinvel({ x: 0, y: 0, z: 0 }, true)
+        rigidBodyRef.current.setTranslation({ x: 0, y: 5, z: 0 }, true)
+      }
     }
   }, [gameState])
 
