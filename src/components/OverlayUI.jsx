@@ -2,6 +2,28 @@ import { useEffect, useRef, useState } from 'react'
 import { useGameStore } from '../store/gameStore.js'
 import { useDeathSound, useWrongLetterSound } from '../audio/sounds.js'
 
+function WordProgressHUD() {
+  const targetWord = useGameStore((state) => state.targetWord)
+  const inventory = useGameStore((state) => state.inventory)
+
+  const display = targetWord
+    .split('')
+    .map((letter, i) => (i < inventory.length ? inventory[i] : '_'))
+    .join(' ')
+
+  return (
+    <div style={{
+      position: 'absolute', top: '1rem', left: '1rem',
+      color: 'white', fontSize: '1.5rem', fontFamily: 'monospace',
+      letterSpacing: '0.25rem', background: 'rgba(0,0,0,0.5)',
+      padding: '0.5rem 1rem', borderRadius: '0.5rem',
+      pointerEvents: 'none',
+    }}>
+      {display}
+    </div>
+  )
+}
+
 export function OverlayUI() {
   const gameState = useGameStore((state) => state.gameState)
   const restart = useGameStore((state) => state.restart)
@@ -46,6 +68,7 @@ export function OverlayUI() {
       pointerEvents: 'none', display: 'flex', flexDirection: 'column',
       justifyContent: 'center', alignItems: 'center',
     }}>
+      {gameState === 'playing' && <WordProgressHUD />}
       {flashRed && (
         <div style={{
           position: 'absolute', inset: 0, background: 'rgba(255,0,0,0.3)',
