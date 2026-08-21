@@ -189,4 +189,11 @@ describe('getEffectiveVocabulary', () => {
     const result = getEffectiveVocabulary(baseVocab, customWords)
     expect(result.level_1.tierReward).toEqual({ type: 'color', value: 'blue' })
   })
+
+  it('never produces duplicate words even if addedWords accidentally overlaps with a builtin word', () => {
+    const customWords = { addedWords: { level_1: ['CAT'], level_2: [], level_3: [] }, hiddenWords: [] }
+    const result = getEffectiveVocabulary(baseVocab, customWords)
+    const uniqueWords = new Set(result.level_1.words)
+    expect(result.level_1.words.length).toBe(uniqueWords.size)
+  })
 })

@@ -9,11 +9,12 @@ export const useCustomWordsStore = create(
       hiddenWords: [],
 
       addWord: (word, tier) => set((state) => {
-        if (state.addedWords[tier].includes(word)) return state
+        const currentTierWords = state.addedWords[tier] || []
+        if (currentTierWords.includes(word)) return state
         return {
           addedWords: {
             ...state.addedWords,
-            [tier]: [...state.addedWords[tier], word],
+            [tier]: [...currentTierWords, word],
           },
         }
       }),
@@ -21,7 +22,7 @@ export const useCustomWordsStore = create(
       removeAddedWord: (word, tier) => set((state) => ({
         addedWords: {
           ...state.addedWords,
-          [tier]: state.addedWords[tier].filter((w) => w !== word),
+          [tier]: (state.addedWords[tier] || []).filter((w) => w !== word),
         },
       })),
 
@@ -31,9 +32,20 @@ export const useCustomWordsStore = create(
           : { hiddenWords: [...state.hiddenWords, word] }
       )),
 
+      // Re-adding a hidden built-in word must un-hide it rather than go through
+      // addWord — otherwise the word ends up in BOTH addedWords and hiddenWords
+      // at once, which corrupts the effective-vocabulary merge once hiddenWords
+      // is later cleared (e.g. via Restore All Defaults).
+      unhideWord: (word) => set((state) => ({
+        hiddenWords: state.hiddenWords.filter((w) => w !== word),
+      })),
+
       restoreDefaults: () => set({ hiddenWords: [] }),
     }),
     {
+      // Word customizations are a distinct concern from game progress, so they
+      // persist under their own storage key rather than piggybacking on the
+      // game store's 'obby-save-data' — clearing/resetting one shouldn't affect the other.
       name: 'obby-custom-vocab',
     }
   )

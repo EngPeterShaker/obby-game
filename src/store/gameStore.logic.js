@@ -64,13 +64,21 @@ export function assignTierByLength(word) {
 
 const TIERS = ['level_1', 'level_2', 'level_3']
 
+// A word that's both parent-added and parent-hidden resolves as hidden: the
+// parent's explicit removal should always win over an (accidental or stale) add.
 export function getEffectiveVocabulary(vocabData, customWords) {
-  const { addedWords, hiddenWords } = customWords
+  const { addedWords = {}, hiddenWords = [] } = customWords
   const result = {}
 
   for (const tier of TIERS) {
     const builtin = vocabData[tier].words.filter((w) => !hiddenWords.includes(w))
-    const added = (addedWords[tier] || []).filter((w) => !hiddenWords.includes(w))
+    // Exclude words already present as builtins (as well as hidden ones) so a
+    // corrupted/legacy addedWords entry that duplicates a builtin word can never
+    // produce a duplicate in the merged output — the array-dedupe safety net
+    // described in the invariant test below.
+    const added = (addedWords[tier] || []).filter(
+      (w) => !hiddenWords.includes(w) && !builtin.includes(w)
+    )
     result[tier] = {
       tierReward: vocabData[tier].tierReward,
       words: [...builtin, ...added],

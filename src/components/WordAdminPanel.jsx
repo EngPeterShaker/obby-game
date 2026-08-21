@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useCustomWordsStore } from '../store/customWordsStore.js'
+import { useGameStore } from '../store/gameStore.js'
 import { getEffectiveVocabulary, assignTierByLength } from '../store/gameStore.logic.js'
 import vocabData from '../data/vocabulary.json'
 
@@ -9,6 +10,9 @@ const TIER_LABELS = {
   level_3: 'Level 3: Hard',
 }
 
+// The math gate is deliberately just friction against a child wandering in
+// mid-play, not real security — do not "harden" this into a real PIN/auth
+// system without discussing that trade-off first.
 function generateMathProblem() {
   const a = Math.floor(Math.random() * 9) + 1
   const b = Math.floor(Math.random() * 9) + 1
@@ -16,6 +20,7 @@ function generateMathProblem() {
 }
 
 export function WordAdminPanel() {
+  const gameState = useGameStore((state) => state.gameState)
   const [isOpen, setIsOpen] = useState(false)
   const [unlocked, setUnlocked] = useState(false)
   const [problem, setProblem] = useState(generateMathProblem)
@@ -30,6 +35,7 @@ export function WordAdminPanel() {
   const addWord = useCustomWordsStore((state) => state.addWord)
   const removeAddedWord = useCustomWordsStore((state) => state.removeAddedWord)
   const hideBuiltinWord = useCustomWordsStore((state) => state.hideBuiltinWord)
+  const unhideWord = useCustomWordsStore((state) => state.unhideWord)
   const restoreDefaults = useCustomWordsStore((state) => state.restoreDefaults)
 
   const effectiveVocab = getEffectiveVocabulary(vocabData, { addedWords, hiddenWords })
@@ -64,6 +70,19 @@ export function WordAdminPanel() {
       return
     }
     const tier = assignTierByLength(word)
+
+    // If this word is a hidden built-in, re-adding it means "un-hide it", not
+    // "add it as a new custom word" — otherwise it ends up in BOTH addedWords
+    // and hiddenWords simultaneously, which corrupts the merge once hiddenWords
+    // is later cleared (e.g. via Restore All Defaults).
+    if (hiddenWords.includes(word) && vocabData[tier].words.includes(word)) {
+      unhideWord(word)
+      setNewWordInput('')
+      setWordError('')
+      setActiveTier(tier)
+      return
+    }
+
     if (effectiveVocab[tier].words.includes(word)) {
       setWordError('Already in the list')
       return
@@ -82,6 +101,8 @@ export function WordAdminPanel() {
       removeAddedWord(word, tier)
     }
   }
+
+  if (gameState !== 'lobby') return null
 
   if (!isOpen) {
     return (
