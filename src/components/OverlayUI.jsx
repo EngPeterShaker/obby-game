@@ -6,6 +6,7 @@ function WordProgressHUD() {
   const targetWord = useGameStore((state) => state.targetWord)
   const inventory = useGameStore((state) => state.inventory)
   const cognitiveStrikes = useGameStore((state) => state.cognitiveStrikes)
+  const masteredWords = useGameStore((state) => state.masteredWords)
 
   const [isRevealed, setIsRevealed] = useState(true)
   const [peekCountdown, setPeekCountdown] = useState(null)
@@ -76,26 +77,25 @@ function WordProgressHUD() {
     <div style={{
       position: 'absolute',
       top: '1rem',
-      left: '50%',
-      transform: 'translateX(-50%)',
+      left: '1rem',
       display: 'flex',
       flexDirection: 'column',
-      alignItems: 'center',
+      alignItems: 'flex-start',
       gap: '0.5rem',
       pointerEvents: 'none',
       zIndex: 10,
     }}>
-      {/* Target Word Container */}
+      {/* Target Word Container (Top-Left) */}
       <div style={{
         background: 'rgba(0, 0, 0, 0.85)',
         backdropFilter: 'blur(8px)',
-        padding: '0.7rem 1.5rem',
+        padding: '0.7rem 1.3rem',
         borderRadius: '1.2rem',
         border: '2px solid rgba(255, 255, 255, 0.2)',
         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
+        alignItems: 'flex-start',
       }}>
         <div style={{
           color: '#fbbf24',
@@ -106,7 +106,7 @@ function WordProgressHUD() {
           marginBottom: '0.3rem',
           display: 'flex',
           alignItems: 'center',
-          gap: '0.4rem',
+          gap: '0.5rem',
         }}>
           <span>🎯 Target Word</span>
           {isRevealed ? (
@@ -133,7 +133,7 @@ function WordProgressHUD() {
         </div>
 
         {/* Letter Boxes */}
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '0.45rem', alignItems: 'center' }}>
           {targetWord.split('').map((char, index) => {
             const isCollected = index < inventory.length
             const isNext = index === nextLetterIndex
@@ -142,15 +142,15 @@ function WordProgressHUD() {
               <div
                 key={index}
                 style={{
-                  width: '3rem',
-                  height: '3.4rem',
-                  borderRadius: '0.7rem',
+                  width: '2.9rem',
+                  height: '3.3rem',
+                  borderRadius: '0.6rem',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'center',
                   alignItems: 'center',
                   fontWeight: '900',
-                  fontSize: '1.7rem',
+                  fontSize: '1.6rem',
                   fontFamily: 'monospace',
                   transition: 'all 0.3s ease',
                   backgroundColor: isCollected
@@ -168,8 +168,8 @@ function WordProgressHUD() {
                     : isRevealed
                     ? '2px solid #4b5563'
                     : '2px dashed #4b5563',
-                  transform: isNext && isRevealed ? 'scale(1.1)' : 'scale(1)',
-                  boxShadow: isNext && isRevealed ? '0 0 16px rgba(234, 179, 8, 0.8)' : 'none',
+                  transform: isNext && isRevealed ? 'scale(1.08)' : 'scale(1)',
+                  boxShadow: isNext && isRevealed ? '0 0 14px rgba(234, 179, 8, 0.8)' : 'none',
                 }}
               >
                 {isCollected ? inventory[index] : isRevealed ? char : '?'}
@@ -180,21 +180,21 @@ function WordProgressHUD() {
 
         {/* Hint or Hidden Notice */}
         <div style={{
-          marginTop: '0.5rem',
-          fontSize: '0.88rem',
+          marginTop: '0.4rem',
+          fontSize: '0.86rem',
           fontWeight: '600',
           color: isRevealed ? '#fef08a' : '#9ca3af',
         }}>
           {isRevealed && nextLetter ? (
-            <span>Collect letter: <strong style={{ fontSize: '1.1rem', color: '#ffffff' }}>"{nextLetter}"</strong></span>
+            <span>Collect letter: <strong style={{ fontSize: '1rem', color: '#ffffff' }}>"{nextLetter}"</strong></span>
           ) : (
-            <span>🧠 Hidden! Remember the word or tap Peek below</span>
+            <span>🧠 Hidden! Remember the letters</span>
           )}
         </div>
       </div>
 
-      {/* Peek Button & Strikes in Row */}
-      <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', pointerEvents: 'auto' }}>
+      {/* Action Row: Peek Button, Strikes, Mastered Trophy */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', pointerEvents: 'auto' }}>
         {/* Peek Button */}
         <button
           onClick={handlePeek}
@@ -205,16 +205,16 @@ function WordProgressHUD() {
             backdropFilter: 'blur(8px)',
             border: '2px solid #fbbf24',
             color: isRevealed ? '#000000' : '#fbbf24',
-            padding: '0.35rem 0.9rem',
+            padding: '0.35rem 0.85rem',
             borderRadius: '0.8rem',
-            fontSize: '0.88rem',
+            fontSize: '0.85rem',
             fontWeight: 'bold',
             cursor: 'pointer',
             boxShadow: isRevealed ? '0 0 14px rgba(234, 179, 8, 0.6)' : '0 4px 12px rgba(0,0,0,0.4)',
             transition: 'all 0.2s ease',
             display: 'flex',
             alignItems: 'center',
-            gap: '0.35rem',
+            gap: '0.3rem',
           }}
         >
           <span>💡</span>
@@ -225,7 +225,7 @@ function WordProgressHUD() {
         <div style={{
           background: 'rgba(0, 0, 0, 0.75)',
           backdropFilter: 'blur(8px)',
-          padding: '0.35rem 0.8rem',
+          padding: '0.35rem 0.75rem',
           borderRadius: '0.8rem',
           border: '1px solid rgba(255,255,255,0.15)',
           color: '#f87171',
@@ -238,6 +238,26 @@ function WordProgressHUD() {
           <span>Strikes:</span>
           <span>{cognitiveStrikes === 0 ? '💚 0/3' : cognitiveStrikes === 1 ? '⚠️ 1/3' : '🚨 2/3'}</span>
         </div>
+
+        {/* Mastered Words Badge */}
+        {masteredWords.length > 0 && (
+          <div style={{
+            background: 'rgba(0, 0, 0, 0.75)',
+            backdropFilter: 'blur(8px)',
+            padding: '0.35rem 0.75rem',
+            borderRadius: '0.8rem',
+            border: '1px solid rgba(234, 179, 8, 0.4)',
+            color: '#fbbf24',
+            fontSize: '0.85rem',
+            fontWeight: 'bold',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.3rem',
+          }}>
+            <span>🏆</span>
+            <span>{masteredWords.length}</span>
+          </div>
+        )}
       </div>
     </div>
   )
@@ -248,7 +268,6 @@ export function OverlayUI() {
   const restart = useGameStore((state) => state.restart)
   const cognitiveStrikes = useGameStore((state) => state.cognitiveStrikes)
   const targetWord = useGameStore((state) => state.targetWord)
-  const masteredWords = useGameStore((state) => state.masteredWords)
 
   const [playDeath] = useDeathSound()
   const [playWrongLetter] = useWrongLetterSound()
@@ -324,30 +343,6 @@ export function OverlayUI() {
       {gameState === 'playing' && (
         <>
           <WordProgressHUD />
-
-          {/* Top-Left: Mastered Words Trophy Badge */}
-          <div style={{
-            position: 'absolute',
-            top: '1rem',
-            left: '1rem',
-            background: 'rgba(0, 0, 0, 0.75)',
-            backdropFilter: 'blur(8px)',
-            padding: '0.5rem 1rem',
-            borderRadius: '0.8rem',
-            border: '1px solid rgba(234, 179, 8, 0.4)',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)',
-            color: '#fbbf24',
-            fontSize: '0.9rem',
-            fontWeight: 'bold',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.4rem',
-            pointerEvents: 'none',
-            zIndex: 10,
-          }}>
-            <span>🏆</span>
-            <span>Mastered ({masteredWords.length}): {masteredWords.length > 0 ? masteredWords.join(', ') : 'None yet'}</span>
-          </div>
 
           {/* Wrong Letter Alert Banner */}
           {wrongLetterMessage && (
