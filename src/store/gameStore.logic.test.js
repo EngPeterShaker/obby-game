@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { getChunkWeights, pickChunkType, pickNextWord, applyCognitiveStrike, getTierRewardAction, pickLetterForChunk } from './gameStore.logic.js'
+import { getChunkWeights, pickChunkType, pickNextWord, applyCognitiveStrike, getTierRewardAction, pickLetterForChunk, assignTierByLength, getEffectiveVocabulary } from './gameStore.logic.js'
 import vocabData from '../data/vocabulary.json'
 
 describe('getChunkWeights', () => {
@@ -132,5 +132,61 @@ describe('pickLetterForChunk', () => {
   it('returns null when the word is already complete', () => {
     expect(pickLetterForChunk('CAT', 3)).toBeNull()
     expect(pickLetterForChunk('CAT', 4)).toBeNull()
+  })
+})
+
+describe('assignTierByLength', () => {
+  it('assigns 3-letter-or-shorter words to level_1', () => {
+    expect(assignTierByLength('CAT')).toBe('level_1')
+    expect(assignTierByLength('GO')).toBe('level_1')
+  })
+
+  it('assigns 4-letter words to level_2', () => {
+    expect(assignTierByLength('JUMP')).toBe('level_2')
+  })
+
+  it('assigns 5-or-more-letter words to level_3', () => {
+    expect(assignTierByLength('SPACE')).toBe('level_3')
+    expect(assignTierByLength('ROCKETSHIP')).toBe('level_3')
+  })
+})
+
+describe('getEffectiveVocabulary', () => {
+  const baseVocab = {
+    level_1: { tierReward: { type: 'color', value: 'blue' }, words: ['CAT', 'DOG'] },
+    level_2: { tierReward: { type: 'trail', value: 'orange' }, words: ['JUMP'] },
+    level_3: { tierReward: { type: 'color', value: 'gold' }, words: ['SPACE'] },
+  }
+
+  it('passes through unchanged when no customization exists', () => {
+    const customWords = { addedWords: { level_1: [], level_2: [], level_3: [] }, hiddenWords: [] }
+    const result = getEffectiveVocabulary(baseVocab, customWords)
+    expect(result.level_1.words).toEqual(['CAT', 'DOG'])
+    expect(result.level_2.words).toEqual(['JUMP'])
+    expect(result.level_3.words).toEqual(['SPACE'])
+  })
+
+  it('excludes a hidden built-in word', () => {
+    const customWords = { addedWords: { level_1: [], level_2: [], level_3: [] }, hiddenWords: ['CAT'] }
+    const result = getEffectiveVocabulary(baseVocab, customWords)
+    expect(result.level_1.words).toEqual(['DOG'])
+  })
+
+  it('includes an added word in its tier', () => {
+    const customWords = { addedWords: { level_1: ['SUN'], level_2: [], level_3: [] }, hiddenWords: [] }
+    const result = getEffectiveVocabulary(baseVocab, customWords)
+    expect(result.level_1.words).toEqual(['CAT', 'DOG', 'SUN'])
+  })
+
+  it('resolves a word both added and hidden as hidden (hidden wins)', () => {
+    const customWords = { addedWords: { level_1: ['SUN'], level_2: [], level_3: [] }, hiddenWords: ['SUN'] }
+    const result = getEffectiveVocabulary(baseVocab, customWords)
+    expect(result.level_1.words).toEqual(['CAT', 'DOG'])
+  })
+
+  it('passes tierReward through unchanged', () => {
+    const customWords = { addedWords: { level_1: [], level_2: [], level_3: [] }, hiddenWords: [] }
+    const result = getEffectiveVocabulary(baseVocab, customWords)
+    expect(result.level_1.tierReward).toEqual({ type: 'color', value: 'blue' })
   })
 })

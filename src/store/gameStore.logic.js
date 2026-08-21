@@ -55,3 +55,27 @@ export function pickLetterForChunk(targetWord, inventoryLength) {
   } while (decoy === nextLetter)
   return decoy
 }
+
+export function assignTierByLength(word) {
+  if (word.length <= 3) return 'level_1'
+  if (word.length === 4) return 'level_2'
+  return 'level_3'
+}
+
+const TIERS = ['level_1', 'level_2', 'level_3']
+
+export function getEffectiveVocabulary(vocabData, customWords) {
+  const { addedWords, hiddenWords } = customWords
+  const result = {}
+
+  for (const tier of TIERS) {
+    const builtin = vocabData[tier].words.filter((w) => !hiddenWords.includes(w))
+    const added = (addedWords[tier] || []).filter((w) => !hiddenWords.includes(w))
+    result[tier] = {
+      tierReward: vocabData[tier].tierReward,
+      words: [...builtin, ...added],
+    }
+  }
+
+  return result
+}
