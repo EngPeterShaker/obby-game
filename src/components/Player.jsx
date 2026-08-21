@@ -98,12 +98,12 @@ export function Player() {
     <Ecctrl
       ref={rigidBodyRef}
       position={[0, 5, 0]}
-      camInitDir={{ x: 0.08, y: Math.PI }}
-      camTargetPos={{ x: 0, y: -0.2, z: 0 }}
+      camInitDir={{ x: 0.35, y: Math.PI }}
+      camTargetPos={{ x: 0, y: 0.01, z: 0 }}
       characterInitDir={Math.PI}
-      camInitDis={-4.0}
-      camMaxDis={-5.5}
-      camMinDis={-2.0}
+      camInitDis={-3.2}
+      camMaxDis={-4.8}
+      camMinDis={-1.5}
       maxVelLimit={6.5}
       sprintMult={2.2}
       jumpVel={7.0}
