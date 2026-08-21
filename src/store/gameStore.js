@@ -30,7 +30,11 @@ export const useGameStore = create((set, get) => ({
   })),
 
   restart: () => {
-    set({ gameState: 'playing', inventory: [] })
+    // playerZ is reset here too (not just activeChunks) so LevelManager's
+    // useFrame never compares a stale death-position playerZ (e.g. -450)
+    // against the freshly-reset chunk window before Player.jsx's own
+    // teleport-on-gameState-change effect catches up next frame.
+    set({ gameState: 'playing', inventory: [], playerZ: 0 })
     get().spawnInitialChunks()
   },
 
