@@ -12,6 +12,7 @@ export const partializeGameState = (state) => ({
   masteredWords: state.masteredWords,
   totalCoins: state.totalCoins,
   currentTier: state.currentTier,
+  cameraPreset: state.cameraPreset,
 })
 
 export const useGameStore = create(
@@ -22,6 +23,7 @@ export const useGameStore = create(
   inventory: [],
   targetWord: pickNextWord('level_1', [], vocabData),
   currentTier: 'level_1',
+  cameraPreset: 'low', // 'low' | 'classic' | 'high' | 'close'
   cognitiveStrikes: 0,
   mechanicalDeaths: 0,
   masteredWords: [],
@@ -39,6 +41,7 @@ export const useGameStore = create(
   activeChunks: [],
 
   // Actions
+  setCameraPreset: (preset) => set({ cameraPreset: preset }),
   die: () => set((state) => ({
     gameState: 'dead',
     mechanicalDeaths: state.mechanicalDeaths + 1,

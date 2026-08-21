@@ -9,6 +9,7 @@ import { LevelManager } from './components/LevelManager.jsx'
 import { ShowcasePlayer } from './components/ShowcasePlayer.jsx'
 import { LobbyUI } from './components/LobbyUI.jsx'
 import { ControlsModal } from './components/ControlsModal.jsx'
+import { SettingsModal } from './components/SettingsModal.jsx'
 import { useGameStore } from './store/gameStore.js'
 
 const NORMAL_SKY_COLOR = '#87ceeb'
@@ -81,6 +82,7 @@ export default function App() {
       </KeyboardControls>
       <LobbyUI />
       <OverlayUI />
+      <SettingsModal />
       <ControlsModal />
     </div>
   )

@@ -20,11 +20,43 @@ function DustEffect({ active }) {
   return <Sparkles count={15} scale={[1, 0.2, 1]} size={4} speed={0.5} color="#e0e0e0" />
 }
 
+export const CAMERA_CONFIGS = {
+  low: {
+    camInitDir: { x: 0.35, y: Math.PI },
+    camTargetPos: { x: 0, y: 0.01, z: 0 },
+    camInitDis: -3.2,
+    camMaxDis: -4.8,
+    camMinDis: -1.5,
+  },
+  classic: {
+    camInitDir: { x: -0.05, y: Math.PI },
+    camTargetPos: { x: 0, y: 0.4, z: 0 },
+    camInitDis: -5.5,
+    camMaxDis: -7.5,
+    camMinDis: -2.5,
+  },
+  high: {
+    camInitDir: { x: -0.28, y: Math.PI },
+    camTargetPos: { x: 0, y: 1.2, z: 0 },
+    camInitDis: -8.0,
+    camMaxDis: -11.0,
+    camMinDis: -3.5,
+  },
+  close: {
+    camInitDir: { x: 0.15, y: Math.PI },
+    camTargetPos: { x: 0, y: 0.2, z: 0 },
+    camInitDis: -2.3,
+    camMaxDis: -3.8,
+    camMinDis: -1.0,
+  },
+}
+
 export function Player() {
   const rigidBodyRef = useRef()
   const gameState = useGameStore((state) => state.gameState)
   const equippedColor = useGameStore((state) => state.equippedColor)
   const equippedTrail = useGameStore((state) => state.equippedTrail)
+  const cameraPreset = useGameStore((state) => state.cameraPreset) || 'low'
   const prevVelYRef = useRef(0)
   const prevJumpRef = useRef(false)
   const respawnTimeRef = useRef(0)
@@ -32,6 +64,8 @@ export function Player() {
   const [isMoving, setIsMoving] = useState(false)
   const dustRearmTimeoutRef = useRef(null)
   const [, getKeys] = useKeyboardControls()
+
+  const camConfig = CAMERA_CONFIGS[cameraPreset] || CAMERA_CONFIGS.low
 
   useFrame(() => {
     if (!rigidBodyRef.current) return
@@ -96,14 +130,15 @@ export function Player() {
 
   return (
     <Ecctrl
+      key={cameraPreset}
       ref={rigidBodyRef}
       position={[0, 5, 0]}
-      camInitDir={{ x: 0.35, y: Math.PI }}
-      camTargetPos={{ x: 0, y: 0.01, z: 0 }}
+      camInitDir={camConfig.camInitDir}
+      camTargetPos={camConfig.camTargetPos}
       characterInitDir={Math.PI}
-      camInitDis={-3.2}
-      camMaxDis={-4.8}
-      camMinDis={-1.5}
+      camInitDis={camConfig.camInitDis}
+      camMaxDis={camConfig.camMaxDis}
+      camMinDis={camConfig.camMinDis}
       maxVelLimit={6.5}
       sprintMult={2.2}
       jumpVel={7.0}

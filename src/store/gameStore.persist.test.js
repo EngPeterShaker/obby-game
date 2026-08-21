@@ -33,7 +33,7 @@ describe('gameStore persist partialize', () => {
     // Call partialize on the mock state
     const partializedState = partialize(mockState)
 
-    // Verify only the 7 fields are present
+    // Verify only the persistent fields are present
     const expectedFields = [
       'unlockedColors',
       'equippedColor',
@@ -42,13 +42,14 @@ describe('gameStore persist partialize', () => {
       'masteredWords',
       'totalCoins',
       'currentTier',
+      'cameraPreset',
     ]
 
     const actualKeys = Object.keys(partializedState).sort()
     const expectedKeys = expectedFields.sort()
 
     expect(actualKeys).toEqual(expectedKeys)
-    expect(actualKeys.length).toBe(7)
+    expect(actualKeys.length).toBe(8)
   })
 
   it('should NOT persist session-only fields like inventory, targetWord, gameState', () => {
