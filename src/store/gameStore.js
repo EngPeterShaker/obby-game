@@ -1,7 +1,13 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { getChunkWeights, pickChunkType, applyCognitiveStrike, pickNextWord, getTierRewardAction, pickLetterForChunk } from './gameStore.logic.js'
+import { getChunkWeights, pickChunkType, applyCognitiveStrike, pickNextWord, getTierRewardAction, pickLetterForChunk, getEffectiveVocabulary } from './gameStore.logic.js'
 import vocabData from '../data/vocabulary.json'
+import { useCustomWordsStore } from './customWordsStore.js'
+
+function getCurrentVocab() {
+  const customWords = useCustomWordsStore.getState()
+  return getEffectiveVocabulary(vocabData, customWords)
+}
 
 // Export partialize function separately for testing purposes
 export const partializeGameState = (state) => ({
@@ -22,7 +28,7 @@ export const useGameStore = create(
   // Reactive UI state
   gameState: 'lobby', // 'lobby' | 'playing' | 'dead' | 'won'
   inventory: [],
-  targetWord: pickNextWord('level_1', [], vocabData),
+  targetWord: pickNextWord('level_1', [], getCurrentVocab()),
   currentTier: 'level_1',
   cameraPreset: 'low', // 'low' | 'classic' | 'high' | 'close'
   guardrails: false, // Accessibility side barriers
@@ -123,7 +129,7 @@ export const useGameStore = create(
     if (char !== expectedLetter) {
       const result = applyCognitiveStrike(
         { cognitiveStrikes: state.cognitiveStrikes, currentTier: state.currentTier },
-        vocabData
+        getCurrentVocab()
       )
       if (result.targetWord !== null) {
         // Downgrade happened
@@ -146,12 +152,13 @@ export const useGameStore = create(
         ? [...state.masteredWords, state.targetWord]
         : state.masteredWords
 
-      const reward = getTierRewardAction(state.currentTier, vocabData)
+      const currentVocab = getCurrentVocab()
+      const reward = getTierRewardAction(state.currentTier, currentVocab)
       const rewardPatch = reward.type === 'color'
         ? { unlockedColors: [...state.unlockedColors, reward.value], equippedColor: reward.value }
         : { unlockedTrails: [...state.unlockedTrails, reward.value], equippedTrail: reward.value }
 
-      const nextWord = pickNextWord(state.currentTier, newMastered, vocabData)
+      const nextWord = pickNextWord(state.currentTier, newMastered, currentVocab)
 
       return {
         inventory: [],
@@ -172,7 +179,7 @@ export const useGameStore = create(
   setTier: (tier) => set({ currentTier: tier }),
   startGame: (selectedTier) => {
     const tier = selectedTier || get().currentTier
-    const nextWord = pickNextWord(tier, get().masteredWords, vocabData)
+    const nextWord = pickNextWord(tier, get().masteredWords, getCurrentVocab())
     set({ gameState: 'playing', currentTier: tier, inventory: [], targetWord: nextWord, playerZ: 0 })
     get().spawnInitialChunks()
   },
