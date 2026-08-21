@@ -87,10 +87,10 @@ function WordProgressHUD() {
     }}>
       {/* Target Word Container (Top-Left) */}
       <div style={{
-        background: 'rgba(0, 0, 0, 0.85)',
+        background: 'rgba(0, 0, 0, 0.82)',
         backdropFilter: 'blur(8px)',
-        padding: '0.7rem 1.3rem',
-        borderRadius: '1.2rem',
+        padding: 'clamp(0.4rem, 1.2vw, 0.65rem) clamp(0.7rem, 2vw, 1.1rem)',
+        borderRadius: '1rem',
         border: '2px solid rgba(255, 255, 255, 0.2)',
         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
         display: 'flex',
@@ -99,22 +99,22 @@ function WordProgressHUD() {
       }}>
         <div style={{
           color: '#fbbf24',
-          fontSize: '0.85rem',
+          fontSize: '0.8rem',
           fontWeight: 'bold',
-          letterSpacing: '0.1rem',
+          letterSpacing: '0.08rem',
           textTransform: 'uppercase',
-          marginBottom: '0.3rem',
+          marginBottom: '0.25rem',
           display: 'flex',
           alignItems: 'center',
-          gap: '0.5rem',
+          gap: '0.4rem',
         }}>
           <span>🎯 Target Word</span>
           {isRevealed ? (
             <span style={{
               background: '#22c55e',
               color: 'white',
-              fontSize: '0.72rem',
-              padding: '0.1rem 0.4rem',
+              fontSize: '0.7rem',
+              padding: '0.08rem 0.35rem',
               borderRadius: '0.3rem',
             }}>
               {peekCountdown ? `Visible (${peekCountdown}s)` : 'Visible'}
@@ -123,8 +123,8 @@ function WordProgressHUD() {
             <span style={{
               background: '#6b7280',
               color: 'white',
-              fontSize: '0.72rem',
-              padding: '0.1rem 0.4rem',
+              fontSize: '0.7rem',
+              padding: '0.08rem 0.35rem',
               borderRadius: '0.3rem',
             }}>
               Hidden
@@ -133,7 +133,7 @@ function WordProgressHUD() {
         </div>
 
         {/* Letter Boxes */}
-        <div style={{ display: 'flex', gap: '0.45rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
           {targetWord.split('').map((char, index) => {
             const isCollected = index < inventory.length
             const isNext = index === nextLetterIndex
@@ -142,15 +142,15 @@ function WordProgressHUD() {
               <div
                 key={index}
                 style={{
-                  width: '2.9rem',
-                  height: '3.3rem',
-                  borderRadius: '0.6rem',
+                  width: 'clamp(2.2rem, 5.5vw, 2.8rem)',
+                  height: 'clamp(2.5rem, 6.5vw, 3.2rem)',
+                  borderRadius: '0.55rem',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'center',
                   alignItems: 'center',
                   fontWeight: '900',
-                  fontSize: '1.6rem',
+                  fontSize: 'clamp(1.2rem, 3.5vw, 1.55rem)',
                   fontFamily: 'monospace',
                   transition: 'all 0.3s ease',
                   backgroundColor: isCollected
@@ -388,192 +388,6 @@ export function OverlayUI() {
               </div>
             </div>
           )}
-
-          {/* Bottom-Left: Touch D-Pad Controls for Tablet / Mobile */}
-          <div style={{
-            position: 'absolute',
-            bottom: '2rem',
-            left: '2rem',
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 3.6rem)',
-            gridTemplateRows: 'repeat(3, 3.6rem)',
-            gap: '0.4rem',
-            pointerEvents: 'auto',
-            zIndex: 20,
-          }}>
-            {/* Top / Forward Button */}
-            <div style={{ gridColumn: '2', gridRow: '1' }}>
-              <button
-                onPointerDown={(e) => {
-                  e.preventDefault()
-                  window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyW', key: 'w', bubbles: true }))
-                }}
-                onPointerUp={(e) => {
-                  e.preventDefault()
-                  window.dispatchEvent(new KeyboardEvent('keyup', { code: 'KeyW', key: 'w', bubbles: true }))
-                }}
-                onPointerLeave={() => {
-                  window.dispatchEvent(new KeyboardEvent('keyup', { code: 'KeyW', key: 'w', bubbles: true }))
-                }}
-                onPointerCancel={() => {
-                  window.dispatchEvent(new KeyboardEvent('keyup', { code: 'KeyW', key: 'w', bubbles: true }))
-                }}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: '0.8rem',
-                  backgroundColor: 'rgba(0, 0, 0, 0.75)',
-                  backdropFilter: 'blur(8px)',
-                  color: 'white',
-                  border: '2px solid rgba(255, 255, 255, 0.3)',
-                  fontSize: '1.4rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
-                  userSelect: 'none',
-                  touchAction: 'none',
-                }}
-              >
-                ⬆️
-              </button>
-            </div>
-
-            {/* Left / Steer Left Button */}
-            <div style={{ gridColumn: '1', gridRow: '2' }}>
-              <button
-                onPointerDown={(e) => {
-                  e.preventDefault()
-                  window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyA', key: 'a', bubbles: true }))
-                }}
-                onPointerUp={(e) => {
-                  e.preventDefault()
-                  window.dispatchEvent(new KeyboardEvent('keyup', { code: 'KeyA', key: 'a', bubbles: true }))
-                }}
-                onPointerLeave={() => {
-                  window.dispatchEvent(new KeyboardEvent('keyup', { code: 'KeyA', key: 'a', bubbles: true }))
-                }}
-                onPointerCancel={() => {
-                  window.dispatchEvent(new KeyboardEvent('keyup', { code: 'KeyA', key: 'a', bubbles: true }))
-                }}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: '0.8rem',
-                  backgroundColor: 'rgba(0, 0, 0, 0.75)',
-                  backdropFilter: 'blur(8px)',
-                  color: 'white',
-                  border: '2px solid rgba(255, 255, 255, 0.3)',
-                  fontSize: '1.4rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
-                  userSelect: 'none',
-                  touchAction: 'none',
-                }}
-              >
-                ⬅️
-              </button>
-            </div>
-
-            {/* Center: Center Pad */}
-            <div style={{
-              gridColumn: '2',
-              gridRow: '2',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              borderRadius: '0.8rem',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
-              fontSize: '0.75rem',
-              color: '#9ca3af',
-              fontWeight: 'bold',
-            }}>
-              MOVE
-            </div>
-
-            {/* Right / Steer Right Button */}
-            <div style={{ gridColumn: '3', gridRow: '2' }}>
-              <button
-                onPointerDown={(e) => {
-                  e.preventDefault()
-                  window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyD', key: 'd', bubbles: true }))
-                }}
-                onPointerUp={(e) => {
-                  e.preventDefault()
-                  window.dispatchEvent(new KeyboardEvent('keyup', { code: 'KeyD', key: 'd', bubbles: true }))
-                }}
-                onPointerLeave={() => {
-                  window.dispatchEvent(new KeyboardEvent('keyup', { code: 'KeyD', key: 'd', bubbles: true }))
-                }}
-                onPointerCancel={() => {
-                  window.dispatchEvent(new KeyboardEvent('keyup', { code: 'KeyD', key: 'd', bubbles: true }))
-                }}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: '0.8rem',
-                  backgroundColor: 'rgba(0, 0, 0, 0.75)',
-                  backdropFilter: 'blur(8px)',
-                  color: 'white',
-                  border: '2px solid rgba(255, 255, 255, 0.3)',
-                  fontSize: '1.4rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
-                  userSelect: 'none',
-                  touchAction: 'none',
-                }}
-              >
-                ➡️
-              </button>
-            </div>
-
-            {/* Bottom / Backward Button */}
-            <div style={{ gridColumn: '2', gridRow: '3' }}>
-              <button
-                onPointerDown={(e) => {
-                  e.preventDefault()
-                  window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyS', key: 's', bubbles: true }))
-                }}
-                onPointerUp={(e) => {
-                  e.preventDefault()
-                  window.dispatchEvent(new KeyboardEvent('keyup', { code: 'KeyS', key: 's', bubbles: true }))
-                }}
-                onPointerLeave={() => {
-                  window.dispatchEvent(new KeyboardEvent('keyup', { code: 'KeyS', key: 's', bubbles: true }))
-                }}
-                onPointerCancel={() => {
-                  window.dispatchEvent(new KeyboardEvent('keyup', { code: 'KeyS', key: 's', bubbles: true }))
-                }}
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: '0.8rem',
-                  backgroundColor: 'rgba(0, 0, 0, 0.75)',
-                  backdropFilter: 'blur(8px)',
-                  color: 'white',
-                  border: '2px solid rgba(255, 255, 255, 0.3)',
-                  fontSize: '1.4rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
-                  userSelect: 'none',
-                  touchAction: 'none',
-                }}
-              >
-                ⬇️
-              </button>
-            </div>
-          </div>
 
           {/* On-screen Controls (Run & Jump) */}
           <div style={{
