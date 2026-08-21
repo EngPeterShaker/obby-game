@@ -31,8 +31,21 @@ export const useGameStore = create(
   totalCoins: 0,
 
   // Persistent cosmetic state (persist wiring added in Task 8)
-  unlockedColors: ['hotpink'],
-  equippedColor: 'hotpink',
+  unlockedColors: [
+    '#ff1493', // Neon Pink
+    '#00e5ff', // Electric Cyan
+    '#10b981', // Emerald Green
+    '#8b5cf6', // Royal Purple
+    '#f97316', // Blaze Orange
+    '#facc15', // Sunburst Gold
+    '#ef4444', // Crimson Red
+    '#14b8a6', // Diamond Teal
+    '#6366f1', // Cosmic Indigo
+    '#ec4899', // Bubblegum Pink
+    '#1e293b', // Stealth Midnight
+    '#f8fafc', // Cloud White
+  ],
+  equippedColor: '#ff1493',
   unlockedTrails: [],
   equippedTrail: null,
 

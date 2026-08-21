@@ -1,5 +1,23 @@
 import { useGameStore } from '../store/gameStore.js'
 
+const COLOR_NAMES = {
+  '#ff1493': 'Neon Pink',
+  'hotpink': 'Neon Pink',
+  '#00e5ff': 'Electric Cyan',
+  '#10b981': 'Emerald Green',
+  '#8b5cf6': 'Royal Purple',
+  '#f97316': 'Blaze Orange',
+  '#facc15': 'Sunburst Gold',
+  '#ef4444': 'Crimson Red',
+  '#14b8a6': 'Diamond Teal',
+  '#6366f1': 'Cosmic Indigo',
+  '#ec4899': 'Bubblegum Pink',
+  '#1e293b': 'Stealth Midnight',
+  '#f8fafc': 'Cloud White',
+  'blue': 'Electric Blue',
+  'gold': 'Champion Gold',
+}
+
 export function LobbyUI() {
   const gameState = useGameStore((state) => state.gameState)
   const unlockedColors = useGameStore((state) => state.unlockedColors)
@@ -73,24 +91,28 @@ export function LobbyUI() {
           border: '1px solid rgba(255, 255, 255, 0.15)',
           boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
         }}>
-          <h3 style={{ color: 'white', margin: '0 0 0.6rem 0', fontSize: '1.1rem' }}>
-            🎨 Outfits ({unlockedColors.length})
+          <h3 style={{ color: 'white', margin: '0 0 0.6rem 0', fontSize: '1.1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>🎨 Outfits ({unlockedColors.length})</span>
+            <span style={{ fontSize: '0.8rem', color: '#9ca3af', fontWeight: 'normal' }}>
+              {COLOR_NAMES[equippedColor] || equippedColor}
+            </span>
           </h3>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
             {unlockedColors.map((color) => (
               <button
                 key={color}
+                title={COLOR_NAMES[color] || color}
                 onClick={() => equipColor(color)}
                 style={{
                   background: color,
-                  width: '2.8rem',
-                  height: '2.8rem',
+                  width: '2.5rem',
+                  height: '2.5rem',
                   border: color === equippedColor ? '3px solid #ffffff' : '2px solid rgba(255,255,255,0.3)',
                   borderRadius: '0.6rem',
                   cursor: 'pointer',
-                  transform: color === equippedColor ? 'scale(1.1)' : 'scale(1)',
-                  transition: 'transform 0.15s ease',
-                  boxShadow: color === equippedColor ? '0 0 12px rgba(255,255,255,0.6)' : 'none',
+                  transform: color === equippedColor ? 'scale(1.12)' : 'scale(1)',
+                  transition: 'all 0.15s ease',
+                  boxShadow: color === equippedColor ? `0 0 14px ${color}` : 'none',
                 }}
               />
             ))}
