@@ -134,6 +134,13 @@ export const useGameStore = create(
     // Correct letter, word not yet finished — THE FIX: strikes reset here too
     return { inventory: newInventory, cognitiveStrikes: 0 }
   }),
+
+  equipColor: (color) => set({ equippedColor: color }),
+  equipTrail: (trail) => set({ equippedTrail: trail }),
+  startGame: () => {
+    set({ gameState: 'playing', inventory: [] })
+    get().spawnInitialChunks()
+  },
     }),
     {
       name: 'obby-save-data',

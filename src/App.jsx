@@ -6,6 +6,8 @@ import { KeyboardControls } from '@react-three/drei'
 import { Player } from './components/Player.jsx'
 import { OverlayUI } from './components/OverlayUI.jsx'
 import { LevelManager } from './components/LevelManager.jsx'
+import { ShowcasePlayer } from './components/ShowcasePlayer.jsx'
+import { LobbyUI } from './components/LobbyUI.jsx'
 import { useGameStore } from './store/gameStore.js'
 
 const NORMAL_SKY_COLOR = '#87ceeb'
@@ -57,6 +59,8 @@ const keyboardMap = [
 ]
 
 export default function App() {
+  const gameState = useGameStore((state) => state.gameState)
+
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
       <KeyboardControls map={keyboardMap}>
@@ -64,12 +68,16 @@ export default function App() {
           <SafeModeBackground />
           <ambientLight intensity={0.5} />
           <directionalLight position={[10, 10, 5]} castShadow />
-          <Physics gravity={[0, -9.81, 0]}>
-            <LevelManager />
-            <Player />
-          </Physics>
+          {gameState === 'lobby' && <ShowcasePlayer />}
+          {(gameState === 'playing' || gameState === 'dead') && (
+            <Physics gravity={[0, -9.81, 0]}>
+              <LevelManager />
+              <Player />
+            </Physics>
+          )}
         </Canvas>
       </KeyboardControls>
+      <LobbyUI />
       <OverlayUI />
     </div>
   )
