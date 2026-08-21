@@ -35,3 +35,23 @@ export function applyCognitiveStrike(state, vocabData) {
 export function getTierRewardAction(tier, vocabData) {
   return vocabData[tier].tierReward
 }
+
+const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+// Decides which letter (correct-next or decoy) should be offered for a
+// newly-spawned chunk. Decoys are required so cognitive failure (spec §3.5)
+// is actually reachable in real play — without them the only object present
+// is always the correct answer, which tests navigation, not spelling.
+export function pickLetterForChunk(targetWord, inventoryLength) {
+  const nextLetter = targetWord[inventoryLength]
+  if (nextLetter === undefined) return null // word already complete, no letter needed
+
+  const isDecoy = Math.random() < 0.5 // roughly half the spawned letters are decoys
+  if (!isDecoy) return nextLetter
+
+  let decoy
+  do {
+    decoy = ALPHABET[Math.floor(Math.random() * ALPHABET.length)]
+  } while (decoy === nextLetter)
+  return decoy
+}

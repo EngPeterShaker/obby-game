@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { getChunkWeights, pickChunkType, applyCognitiveStrike, pickNextWord, getTierRewardAction } from './gameStore.logic.js'
+import { getChunkWeights, pickChunkType, applyCognitiveStrike, pickNextWord, getTierRewardAction, pickLetterForChunk } from './gameStore.logic.js'
 import vocabData from '../data/vocabulary.json'
 
 // Export partialize function separately for testing purposes
@@ -70,15 +70,15 @@ export const useGameStore = create(
     const weights = getChunkWeights(state.mechanicalDeaths)
     const nextType = pickChunkType(weights)
 
-    const nextLetter = state.targetWord[state.inventory.length]
-    const hasLetter = nextLetter !== undefined && Math.random() < 0.4
+    const letterForChunk = pickLetterForChunk(state.targetWord, state.inventory.length)
+    const hasLetter = letterForChunk !== null && Math.random() < 0.4 // keep the existing 40% spawn-chance gate
 
     const newChunk = {
       id: `chunk-${Date.now()}-${Math.random()}`,
       type: nextType,
       position: [0, -0.5, lastChunk.position[2] - 10],
       hasLetter,
-      letter: hasLetter ? nextLetter : null,
+      letter: hasLetter ? letterForChunk : null,
     }
 
     return { activeChunks: [...rest, newChunk] }

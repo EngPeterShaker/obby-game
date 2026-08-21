@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { getChunkWeights, pickChunkType, pickNextWord, applyCognitiveStrike, getTierRewardAction } from './gameStore.logic.js'
+import { getChunkWeights, pickChunkType, pickNextWord, applyCognitiveStrike, getTierRewardAction, pickLetterForChunk } from './gameStore.logic.js'
 import vocabData from '../data/vocabulary.json'
 
 describe('getChunkWeights', () => {
@@ -89,5 +89,46 @@ describe('getTierRewardAction', () => {
   it('returns the reward object for the given tier', () => {
     expect(getTierRewardAction('level_1', vocabData)).toEqual({ type: 'color', value: 'blue' })
     expect(getTierRewardAction('level_2', vocabData)).toEqual({ type: 'trail', value: 'orange' })
+  })
+})
+
+describe('pickLetterForChunk', () => {
+  it('returns the correct next letter when the roll is at/above the decoy threshold', () => {
+    // isDecoy = Math.random() < 0.5, so a roll >= 0.5 means NOT a decoy.
+    vi.spyOn(Math, 'random').mockReturnValue(0.9)
+    expect(pickLetterForChunk('CAT', 1)).toBe('A')
+    vi.restoreAllMocks()
+  })
+
+  it('returns a decoy letter when the roll is below the decoy threshold', () => {
+    // First call: decoy-decision roll (< 0.5 => decoy). Second call: picks
+    // the alphabet index. With targetWord 'CAT' and inventoryLength 1, the
+    // correct next letter is 'A' (index 0). Force the alphabet-index roll to
+    // land on 'B' (index 1) to get a deterministic, unambiguous decoy.
+    vi.spyOn(Math, 'random')
+      .mockReturnValueOnce(0.1) // decoy decision: isDecoy = true
+      .mockReturnValueOnce(1 / 26) // alphabet index roll -> 'B'
+    const result = pickLetterForChunk('CAT', 1)
+    expect(result).toBe('B')
+    expect(result).not.toBe('A')
+    vi.restoreAllMocks()
+  })
+
+  it('never returns the correct next letter when it decides to decoy', () => {
+    const targetWord = 'CAT'
+    const inventoryLength = 1 // correct next letter is 'A'
+    for (let i = 0; i < 50; i++) {
+      vi.spyOn(Math, 'random')
+        .mockReturnValueOnce(0.1) // force isDecoy = true
+        .mockReturnValueOnce(Math.random()) // random alphabet index each iteration
+      const result = pickLetterForChunk(targetWord, inventoryLength)
+      expect(result).not.toBe('A')
+      vi.restoreAllMocks()
+    }
+  })
+
+  it('returns null when the word is already complete', () => {
+    expect(pickLetterForChunk('CAT', 3)).toBeNull()
+    expect(pickLetterForChunk('CAT', 4)).toBeNull()
   })
 })
