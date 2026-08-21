@@ -1,15 +1,19 @@
 import * as THREE from 'three'
 import { RigidBody } from '@react-three/rapier'
+import { Collectible } from './Collectible.jsx'
 
 // Flyweight: allocated once, shared across every chunk instance (spec §3.10)
 const floorGeometry = new THREE.BoxGeometry(10, 1, 10)
 const floorMaterial = new THREE.MeshStandardMaterial({ color: 'gray' })
 const gapFloorGeometry = new THREE.BoxGeometry(10, 1, 4)
 
-export function BasicChunk({ position }) {
+export function BasicChunk({ position, chunk }) {
   return (
     <RigidBody type="fixed" position={position} colliders="cuboid">
       <mesh geometry={floorGeometry} material={floorMaterial} receiveShadow />
+      {chunk?.hasLetter && (
+        <Collectible letter={chunk.letter} position={[position[0], position[1] + 1.5, position[2]]} />
+      )}
     </RigidBody>
   )
 }
@@ -31,7 +35,7 @@ export function GapChunk({ position }) {
 export function ChunkRenderer({ chunk }) {
   switch (chunk.type) {
     case 'basic':
-      return <BasicChunk position={chunk.position} />
+      return <BasicChunk position={chunk.position} chunk={chunk} />
     case 'gap':
       return <GapChunk position={chunk.position} />
     default:
