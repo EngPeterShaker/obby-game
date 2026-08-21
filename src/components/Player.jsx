@@ -86,7 +86,7 @@ export function Player() {
     }
 
     // Direct, ultra-responsive, fail-proof jump handling
-    const { jump } = getKeys ? getKeys() : {}
+    const { jump, run, forward, backward } = getKeys ? getKeys() : {}
     const justPressedJump = jump && !prevJumpRef.current
     prevJumpRef.current = !!jump
 
@@ -96,6 +96,15 @@ export function Player() {
       setDustActive(true)
       clearTimeout(dustRearmTimeoutRef.current)
       dustRearmTimeoutRef.current = setTimeout(() => setDustActive(false), 200)
+    }
+
+    // Direct sprint forward acceleration
+    if (run && gameState === 'playing' && y >= -1.5) {
+      if (forward || !backward) {
+        if (velZ > -12.0) {
+          rigidBodyRef.current.applyImpulse({ x: 0, y: 0, z: -0.4 }, true)
+        }
+      }
     }
 
     const wasFalling = prevVelYRef.current < -0.5
@@ -119,7 +128,7 @@ export function Player() {
       } else if (gameState === 'dead') {
         // Freeze falling immediately on death so the body isn't at y = -200
         rigidBodyRef.current.setLinvel({ x: 0, y: 0, z: 0 }, true)
-        rigidBodyRef.current.setTranslation({ x: 0, y: 5, z: 0 }, true)
+        rigidBodyRef.current.setAngvel({ x: 0, y: 0, z: 0 }, true)
       }
     }
   }, [gameState])
@@ -139,8 +148,8 @@ export function Player() {
       camInitDis={camConfig.camInitDis}
       camMaxDis={camConfig.camMaxDis}
       camMinDis={camConfig.camMinDis}
-      maxVelLimit={6.5}
-      sprintMult={2.2}
+      maxVelLimit={8.0}
+      sprintMult={2.5}
       jumpVel={7.0}
       animated={false}
     >
