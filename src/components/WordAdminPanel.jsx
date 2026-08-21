@@ -90,7 +90,7 @@ export function WordAdminPanel() {
         style={{
           position: 'absolute',
           top: '1rem',
-          right: '24rem',
+          right: '30rem',
           zIndex: 30,
           pointerEvents: 'auto',
           backgroundColor: 'rgba(0, 0, 0, 0.75)',
