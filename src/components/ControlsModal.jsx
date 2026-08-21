@@ -257,7 +257,7 @@ export function ControlsModal() {
               <div><strong>🎯 Memory Goal:</strong> The target word is revealed for 3 seconds then hides into <code>[ ? ]</code>!</div>
               <div>• Collect the letters in order to spell the word.</div>
               <div>• Tap <strong>💡 Peek Word (2s)</strong> anytime to reveal the word for 2 seconds.</div>
-              <div>• Avoid decoy letters and jump over the molten lava gaps!</div>
+              <div>• Jump over molten lava gaps and dodge <strong>🦅 Flying Birds</strong> (hitting a bird is instant death!).</div>
             </div>
 
             {/* Close Button */}

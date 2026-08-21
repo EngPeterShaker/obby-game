@@ -10,6 +10,7 @@ import { ShowcasePlayer } from './components/ShowcasePlayer.jsx'
 import { LobbyUI } from './components/LobbyUI.jsx'
 import { ControlsModal } from './components/ControlsModal.jsx'
 import { SettingsModal } from './components/SettingsModal.jsx'
+import { SkyHazards } from './components/SkyHazards.jsx'
 import { useGameStore } from './store/gameStore.js'
 
 const NORMAL_SKY_COLOR = '#87ceeb'
@@ -70,6 +71,7 @@ export default function App() {
           <SafeModeBackground />
           <ambientLight intensity={0.5} />
           <directionalLight position={[10, 10, 5]} castShadow />
+          <SkyHazards />
           {gameState === 'lobby' && <ShowcasePlayer />}
           {(gameState === 'playing' || gameState === 'dead') && (
             <Physics gravity={[0, -9.81, 0]}>
