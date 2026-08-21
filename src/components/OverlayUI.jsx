@@ -126,6 +126,7 @@ export function OverlayUI() {
   const restart = useGameStore((state) => state.restart)
   const cognitiveStrikes = useGameStore((state) => state.cognitiveStrikes)
   const targetWord = useGameStore((state) => state.targetWord)
+  const masteredWords = useGameStore((state) => state.masteredWords)
 
   const [playDeath] = useDeathSound()
   const [playWrongLetter] = useWrongLetterSound()
@@ -202,6 +203,30 @@ export function OverlayUI() {
         <>
           <WordProgressHUD />
 
+          {/* Top-Left: Mastered Words Trophy Badge */}
+          <div style={{
+            position: 'absolute',
+            top: '1rem',
+            left: '1rem',
+            background: 'rgba(0, 0, 0, 0.75)',
+            backdropFilter: 'blur(8px)',
+            padding: '0.5rem 1rem',
+            borderRadius: '0.8rem',
+            border: '1px solid rgba(234, 179, 8, 0.4)',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)',
+            color: '#fbbf24',
+            fontSize: '0.9rem',
+            fontWeight: 'bold',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.4rem',
+            pointerEvents: 'none',
+            zIndex: 10,
+          }}>
+            <span>🏆</span>
+            <span>Mastered ({masteredWords.length}): {masteredWords.length > 0 ? masteredWords.join(', ') : 'None yet'}</span>
+          </div>
+
           {/* Wrong Letter Alert Banner */}
           {wrongLetterMessage && (
             <div style={{
@@ -228,14 +253,22 @@ export function OverlayUI() {
               top: '8rem',
               backgroundColor: 'rgba(22, 163, 74, 0.95)',
               color: 'white',
-              padding: '0.8rem 1.8rem',
-              borderRadius: '1rem',
-              fontSize: '1.3rem',
+              padding: '1rem 2rem',
+              borderRadius: '1.2rem',
+              fontSize: '1.35rem',
               fontWeight: 'bold',
-              boxShadow: '0 6px 20px rgba(0,0,0,0.5)',
-              border: '2px solid #86efac',
+              boxShadow: '0 8px 30px rgba(0,0,0,0.6)',
+              border: '3px solid #86efac',
+              textAlign: 'center',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.3rem',
+              animation: 'fadeIn 0.2s',
             }}>
-              {celebrationMessage}
+              <div>{celebrationMessage}</div>
+              <div style={{ fontSize: '0.95rem', color: '#bbf7d0', fontWeight: 'normal' }}>
+                ⭐ Added to your Mastered Trophy Shelf & Unlocked New Outfit!
+              </div>
             </div>
           )}
 
