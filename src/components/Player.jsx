@@ -3,7 +3,7 @@
 // .translation(), .setTranslation(), .linvel(), .setLinvel(), etc. directly.
 import { useRef, useEffect, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { Sparkles } from '@react-three/drei'
+import { Sparkles, Trail } from '@react-three/drei'
 import Ecctrl from 'ecctrl'
 import { useGameStore } from '../store/gameStore.js'
 
@@ -33,6 +33,8 @@ function DustEffect({ active }) {
 export function Player() {
   const rigidBodyRef = useRef()
   const gameState = useGameStore((state) => state.gameState)
+  const equippedColor = useGameStore((state) => state.equippedColor)
+  const equippedTrail = useGameStore((state) => state.equippedTrail)
   const prevVelYRef = useRef(0)
   const [dustActive, setDustActive] = useState(false)
   // Holds the id of the "re-arm" timeout scheduled below, so it can be
@@ -101,10 +103,19 @@ export function Player() {
       jumpVel={5}
       animated={false}
     >
-      <mesh castShadow position={[0, -0.9, 0]}>
-        <capsuleGeometry args={[0.4, 1]} />
-        <meshStandardMaterial color="hotpink" />
-      </mesh>
+      {equippedTrail ? (
+        <Trail width={1.5} length={4} decay={2} color={equippedTrail}>
+          <mesh castShadow position={[0, -0.9, 0]}>
+            <capsuleGeometry args={[0.4, 1]} />
+            <meshStandardMaterial color={equippedColor} />
+          </mesh>
+        </Trail>
+      ) : (
+        <mesh castShadow position={[0, -0.9, 0]}>
+          <capsuleGeometry args={[0.4, 1]} />
+          <meshStandardMaterial color={equippedColor} />
+        </mesh>
+      )}
       <DustEffect active={dustActive} />
     </Ecctrl>
   )
