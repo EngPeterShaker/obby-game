@@ -6,6 +6,7 @@ import { useGameStore } from '../store/gameStore.js'
 
 export function Collectible({ letter, position }) {
   const [collected, setCollected] = useState(false)
+  const [unmounted, setUnmounted] = useState(false)
   const collectLetter = useGameStore((state) => state.collectLetter)
 
   const { scale } = useSpring({
@@ -15,7 +16,6 @@ export function Collectible({ letter, position }) {
       if (collected) setUnmounted(true)
     },
   })
-  const [unmounted, setUnmounted] = useState(false)
 
   if (unmounted) return null
 
