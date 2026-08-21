@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import * as THREE from 'three'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Physics } from '@react-three/rapier'
-import { KeyboardControls } from '@react-three/drei'
+import { KeyboardControls, ContactShadows } from '@react-three/drei'
 import { Player } from './components/Player.jsx'
 import { OverlayUI } from './components/OverlayUI.jsx'
 import { LevelManager } from './components/LevelManager.jsx'
@@ -73,6 +73,7 @@ export default function App() {
             <Physics gravity={[0, -9.81, 0]}>
               <LevelManager />
               <Player />
+              <ContactShadows position={[0, -0.49, 0]} opacity={0.4} scale={10} blur={2} far={10} />
             </Physics>
           )}
         </Canvas>

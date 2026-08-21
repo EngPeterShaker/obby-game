@@ -1,8 +1,44 @@
+import { useEffect, useRef, useState } from 'react'
 import { useGameStore } from '../store/gameStore.js'
+import { useDeathSound, useWrongLetterSound } from '../audio/sounds.js'
 
 export function OverlayUI() {
   const gameState = useGameStore((state) => state.gameState)
   const restart = useGameStore((state) => state.restart)
+  const cognitiveStrikes = useGameStore((state) => state.cognitiveStrikes)
+
+  const [playDeath] = useDeathSound()
+  const [playWrongLetter] = useWrongLetterSound()
+  const prevGameState = useRef(gameState)
+  const prevStrikes = useRef(cognitiveStrikes)
+  const [flashRed, setFlashRed] = useState(false)
+
+  // Death sound: fire once on the 'playing' -> 'dead' transition, not on
+  // every render while gameState === 'dead'.
+  useEffect(() => {
+    if (gameState === 'dead' && prevGameState.current !== 'dead') {
+      playDeath()
+    }
+    prevGameState.current = gameState
+  }, [gameState, playDeath])
+
+  // Wrong-letter feedback: cognitiveStrikes only increases on a wrong-letter
+  // collection (collectLetter in gameStore.js resets it to 0 on any correct
+  // pickup), so a strict increase is an unambiguous "wrong letter" event.
+  // The 200ms flash uses a cleanup-cleared setTimeout so a death (which
+  // unmounts nothing here, since OverlayUI stays mounted, but could still
+  // race a restart/state change) never calls setState after this effect's
+  // own re-run or the component's unmount.
+  useEffect(() => {
+    if (cognitiveStrikes > prevStrikes.current) {
+      playWrongLetter()
+      setFlashRed(true)
+      const timeout = setTimeout(() => setFlashRed(false), 200)
+      prevStrikes.current = cognitiveStrikes
+      return () => clearTimeout(timeout)
+    }
+    prevStrikes.current = cognitiveStrikes
+  }, [cognitiveStrikes, playWrongLetter])
 
   return (
     <div style={{
@@ -10,6 +46,12 @@ export function OverlayUI() {
       pointerEvents: 'none', display: 'flex', flexDirection: 'column',
       justifyContent: 'center', alignItems: 'center',
     }}>
+      {flashRed && (
+        <div style={{
+          position: 'absolute', inset: 0, background: 'rgba(255,0,0,0.3)',
+          pointerEvents: 'none',
+        }} />
+      )}
       {gameState === 'dead' && (
         <div style={{
           pointerEvents: 'auto', background: 'rgba(0,0,0,0.85)',

@@ -3,11 +3,13 @@ import { useSpring, animated } from '@react-spring/three'
 import { RigidBody, CuboidCollider } from '@react-three/rapier'
 import { Text } from '@react-three/drei'
 import { useGameStore } from '../store/gameStore.js'
+import { useCollectSound } from '../audio/sounds.js'
 
 export function Collectible({ letter, position }) {
   const [collected, setCollected] = useState(false)
   const [unmounted, setUnmounted] = useState(false)
   const collectLetter = useGameStore((state) => state.collectLetter)
+  const [playCollect] = useCollectSound()
 
   const { scale } = useSpring({
     scale: collected ? 0 : 1,
@@ -26,6 +28,7 @@ export function Collectible({ letter, position }) {
         sensor
         onIntersectionEnter={() => {
           if (!collected) {
+            playCollect()
             collectLetter(letter)
             setCollected(true)
           }
