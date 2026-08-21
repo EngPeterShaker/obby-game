@@ -149,9 +149,11 @@ export const useGameStore = create(
 
   equipColor: (color) => set({ equippedColor: color }),
   equipTrail: (trail) => set({ equippedTrail: trail }),
-  startGame: () => {
-    const nextWord = pickNextWord(get().currentTier, get().masteredWords, vocabData)
-    set({ gameState: 'playing', inventory: [], targetWord: nextWord, playerZ: 0 })
+  setTier: (tier) => set({ currentTier: tier }),
+  startGame: (selectedTier) => {
+    const tier = selectedTier || get().currentTier
+    const nextWord = pickNextWord(tier, get().masteredWords, vocabData)
+    set({ gameState: 'playing', currentTier: tier, inventory: [], targetWord: nextWord, playerZ: 0 })
     get().spawnInitialChunks()
   },
     }),

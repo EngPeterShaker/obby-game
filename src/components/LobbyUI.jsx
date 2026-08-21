@@ -9,9 +9,35 @@ export function LobbyUI() {
   const equippedTrail = useGameStore((state) => state.equippedTrail)
   const equipTrail = useGameStore((state) => state.equipTrail)
   const masteredWords = useGameStore((state) => state.masteredWords)
+  const currentTier = useGameStore((state) => state.currentTier)
+  const setTier = useGameStore((state) => state.setTier)
   const startGame = useGameStore((state) => state.startGame)
 
   if (gameState !== 'lobby') return null
+
+  const levelOptions = [
+    {
+      id: 'level_1',
+      title: 'Level 1: Easy',
+      badge: '3 Letters',
+      examples: 'CAT, DOG, SUN, ONE, TEN...',
+      color: '#22c55e',
+    },
+    {
+      id: 'level_2',
+      title: 'Level 2: Medium',
+      badge: '4 Letters',
+      examples: 'JUMP, FAST, BIRD, STAR, FOUR...',
+      color: '#eab308',
+    },
+    {
+      id: 'level_3',
+      title: 'Level 3: Hard',
+      badge: '5+ Letters',
+      examples: 'SPACE, ROCKET, PLANET, THREE...',
+      color: '#ef4444',
+    },
+  ]
 
   return (
     <div style={{
@@ -163,10 +189,77 @@ export function LobbyUI() {
         </div>
       </div>
 
-      {/* Bottom Center: Play Button */}
-      <div style={{ pointerEvents: 'auto', textAlign: 'center', marginBottom: '1rem' }}>
+      {/* Bottom Center: Difficulty / Level Selector + Play Button */}
+      <div style={{
+        pointerEvents: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '1rem',
+        marginBottom: '1rem',
+      }}>
+        {/* Level Selection Card */}
+        <div style={{
+          background: 'rgba(0, 0, 0, 0.8)',
+          backdropFilter: 'blur(10px)',
+          padding: '1rem 1.4rem',
+          borderRadius: '1.2rem',
+          border: '2px solid rgba(255, 255, 255, 0.2)',
+          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '0.6rem',
+        }}>
+          <div style={{ color: '#ffffff', fontSize: '1rem', fontWeight: 'bold', letterSpacing: '0.05rem' }}>
+            📖 Select Word Difficulty:
+          </div>
+
+          <div style={{ display: 'flex', gap: '0.8rem' }}>
+            {levelOptions.map((opt) => {
+              const isSelected = currentTier === opt.id
+              return (
+                <button
+                  key={opt.id}
+                  onClick={() => setTier(opt.id)}
+                  style={{
+                    backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.5)',
+                    border: isSelected ? `3px solid ${opt.color}` : '2px solid #4b5563',
+                    borderRadius: '0.8rem',
+                    padding: '0.6rem 1rem',
+                    cursor: 'pointer',
+                    color: 'white',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '0.25rem',
+                    transform: isSelected ? 'scale(1.05)' : 'scale(1)',
+                    boxShadow: isSelected ? `0 0 16px ${opt.color}66` : 'none',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  <div style={{ fontWeight: 'bold', fontSize: '0.95rem', color: opt.color }}>
+                    {opt.title}
+                  </div>
+                  <div style={{
+                    fontSize: '0.78rem',
+                    background: opt.color,
+                    color: '#000000',
+                    fontWeight: 'bold',
+                    padding: '0.1rem 0.4rem',
+                    borderRadius: '0.3rem',
+                  }}>
+                    {opt.badge}
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Play Button */}
         <button
-          onClick={startGame}
+          onClick={() => startGame(currentTier)}
           style={{
             fontSize: '2.2rem',
             fontWeight: '900',
