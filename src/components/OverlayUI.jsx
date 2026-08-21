@@ -137,6 +137,9 @@ export function OverlayUI() {
   const [wrongLetterMessage, setWrongLetterMessage] = useState(null)
   const [celebrationMessage, setCelebrationMessage] = useState(null)
 
+  const flashRedTimeoutRef = useRef(null)
+  const wrongLetterMessageTimeoutRef = useRef(null)
+
   // Death sound
   useEffect(() => {
     if (gameState === 'dead' && prevGameState.current !== 'dead') {
@@ -145,22 +148,37 @@ export function OverlayUI() {
     prevGameState.current = gameState
   }, [gameState, playDeath])
 
-  // Wrong-letter feedback
+  // Wrong-letter feedback with guaranteed 2.0-second auto-clearing timer
   useEffect(() => {
     if (cognitiveStrikes > prevStrikes.current) {
       playWrongLetter()
       setFlashRed(true)
       setWrongLetterMessage('❌ Wrong Letter! Check the top banner!')
-      const timeout1 = setTimeout(() => setFlashRed(false), 250)
-      const timeout2 = setTimeout(() => setWrongLetterMessage(null), 1500)
-      prevStrikes.current = cognitiveStrikes
-      return () => {
-        clearTimeout(timeout1)
-        clearTimeout(timeout2)
-      }
+
+      // Clear any existing timers
+      if (flashRedTimeoutRef.current) clearTimeout(flashRedTimeoutRef.current)
+      if (wrongLetterMessageTimeoutRef.current) clearTimeout(wrongLetterMessageTimeoutRef.current)
+
+      // Auto-clear red screen overlay after 2 seconds
+      flashRedTimeoutRef.current = setTimeout(() => {
+        setFlashRed(false)
+      }, 2000)
+
+      // Auto-clear message banner after 2 seconds
+      wrongLetterMessageTimeoutRef.current = setTimeout(() => {
+        setWrongLetterMessage(null)
+      }, 2000)
     }
     prevStrikes.current = cognitiveStrikes
   }, [cognitiveStrikes, playWrongLetter])
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      if (flashRedTimeoutRef.current) clearTimeout(flashRedTimeoutRef.current)
+      if (wrongLetterMessageTimeoutRef.current) clearTimeout(wrongLetterMessageTimeoutRef.current)
+    }
+  }, [])
 
   // Word completed celebration
   useEffect(() => {
@@ -189,13 +207,14 @@ export function OverlayUI() {
             <div style={{
               position: 'absolute',
               top: '8rem',
-              backgroundColor: 'rgba(220, 38, 38, 0.9)',
+              backgroundColor: 'rgba(220, 38, 38, 0.95)',
               color: 'white',
-              padding: '0.6rem 1.4rem',
+              padding: '0.7rem 1.6rem',
               borderRadius: '0.8rem',
-              fontSize: '1.1rem',
+              fontSize: '1.15rem',
               fontWeight: 'bold',
               boxShadow: '0 4px 14px rgba(0,0,0,0.5)',
+              border: '2px solid #fca5a5',
               animation: 'fadeIn 0.2s',
             }}>
               {wrongLetterMessage}
@@ -299,10 +318,15 @@ export function OverlayUI() {
         </>
       )}
 
+      {/* Red Warning Screen Overlay with smooth fade */}
       {flashRed && (
         <div style={{
-          position: 'absolute', inset: 0, background: 'rgba(255,0,0,0.35)',
+          position: 'absolute',
+          inset: 0,
+          background: 'rgba(239, 68, 68, 0.22)',
+          boxShadow: 'inset 0 0 90px rgba(220, 38, 38, 0.7)',
           pointerEvents: 'none',
+          transition: 'all 0.3s ease',
         }} />
       )}
 
