@@ -20,7 +20,7 @@ export const useGameStore = create(
   // Reactive UI state
   gameState: 'lobby', // 'lobby' | 'playing' | 'dead' | 'won'
   inventory: [],
-  targetWord: 'CAT',
+  targetWord: pickNextWord('level_1', [], vocabData),
   currentTier: 'level_1',
   cognitiveStrikes: 0,
   mechanicalDeaths: 0,
@@ -150,7 +150,8 @@ export const useGameStore = create(
   equipColor: (color) => set({ equippedColor: color }),
   equipTrail: (trail) => set({ equippedTrail: trail }),
   startGame: () => {
-    set({ gameState: 'playing', inventory: [] })
+    const nextWord = pickNextWord(get().currentTier, get().masteredWords, vocabData)
+    set({ gameState: 'playing', inventory: [], targetWord: nextWord, playerZ: 0 })
     get().spawnInitialChunks()
   },
     }),
