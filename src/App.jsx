@@ -13,6 +13,7 @@ import { SettingsModal } from './components/SettingsModal.jsx'
 import { SkyHazards } from './components/SkyHazards.jsx'
 import { LandscapeGuard } from './components/LandscapeGuard.jsx'
 import { AdaptiveCameraScaler } from './components/AdaptiveCameraScaler.jsx'
+import { TouchSwipeController } from './components/TouchSwipeController.jsx'
 import { useGameStore } from './store/gameStore.js'
 
 const NORMAL_SKY_COLOR = '#87ceeb'
@@ -88,6 +89,7 @@ export default function App() {
       </KeyboardControls>
       <LobbyUI />
       <OverlayUI />
+      <TouchSwipeController />
       <SettingsModal />
       <ControlsModal />
     </div>
