@@ -43,13 +43,14 @@ describe('gameStore persist partialize', () => {
       'totalCoins',
       'currentTier',
       'cameraPreset',
+      'guardrails',
     ]
 
     const actualKeys = Object.keys(partializedState).sort()
     const expectedKeys = expectedFields.sort()
 
     expect(actualKeys).toEqual(expectedKeys)
-    expect(actualKeys.length).toBe(8)
+    expect(actualKeys.length).toBe(9)
   })
 
   it('should NOT persist session-only fields like inventory, targetWord, gameState', () => {

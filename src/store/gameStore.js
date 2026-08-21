@@ -13,6 +13,7 @@ export const partializeGameState = (state) => ({
   totalCoins: state.totalCoins,
   currentTier: state.currentTier,
   cameraPreset: state.cameraPreset,
+  guardrails: state.guardrails,
 })
 
 export const useGameStore = create(
@@ -24,6 +25,7 @@ export const useGameStore = create(
   targetWord: pickNextWord('level_1', [], vocabData),
   currentTier: 'level_1',
   cameraPreset: 'low', // 'low' | 'classic' | 'high' | 'close'
+  guardrails: false, // Accessibility side barriers
   cognitiveStrikes: 0,
   mechanicalDeaths: 0,
   masteredWords: [],
@@ -55,6 +57,8 @@ export const useGameStore = create(
 
   // Actions
   setCameraPreset: (preset) => set({ cameraPreset: preset }),
+  setGuardrails: (val) => set({ guardrails: val }),
+  toggleGuardrails: () => set((state) => ({ guardrails: !state.guardrails })),
   die: () => set((state) => ({
     gameState: 'dead',
     mechanicalDeaths: state.mechanicalDeaths + 1,

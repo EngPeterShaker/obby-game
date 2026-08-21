@@ -56,19 +56,51 @@ const grassPatchGeometry = new THREE.BoxGeometry(3.5, 0.2, 10)
 const gapGrassPatchGeometry = new THREE.BoxGeometry(3.5, 0.2, 3.2)
 const grassPatchMaterial = new THREE.MeshStandardMaterial({ color: '#22c55e', roughness: 0.9 })
 
-// Safety Mode bumpers (spec §3.5): neon wireframe guard rails that appear
-// on chunk edges once mechanicalDeaths >= 6.
-const bumperGeometry = new THREE.BoxGeometry(1, 2, 10)
-const gapBumperGeometry = new THREE.BoxGeometry(1, 2, 3.2)
-const bumperMaterial = new THREE.MeshBasicMaterial({ color: '#00ffcc', wireframe: true })
+// Guardrails Geometry & Materials (solid side rails with posts)
+const railBeamGeometry = new THREE.BoxGeometry(0.3, 0.4, 10)
+const railBeamGlowGeometry = new THREE.BoxGeometry(0.32, 0.15, 10)
+const railPostGeometry = new THREE.BoxGeometry(0.35, 1.4, 0.35)
+const gapRailBeamGeometry = new THREE.BoxGeometry(0.3, 0.4, 3.2)
+const gapRailBeamGlowGeometry = new THREE.BoxGeometry(0.32, 0.15, 3.2)
+
+const railMaterial = new THREE.MeshStandardMaterial({
+  color: '#e2e8f0',
+  metalness: 0.8,
+  roughness: 0.2,
+})
+const railGlowMaterial = new THREE.MeshStandardMaterial({
+  color: '#38bdf8',
+  emissive: '#0284c7',
+  emissiveIntensity: 0.8,
+})
+const railPostMaterial = new THREE.MeshStandardMaterial({
+  color: '#334155',
+  metalness: 0.5,
+  roughness: 0.5,
+})
 
 function SafetyBumpers() {
   return (
     <>
-      <mesh geometry={bumperGeometry} material={bumperMaterial} position={[-4.5, 1, 0]} />
-      <CuboidCollider args={[0.5, 1, 5]} position={[-4.5, 1, 0]} />
-      <mesh geometry={bumperGeometry} material={bumperMaterial} position={[4.5, 1, 0]} />
-      <CuboidCollider args={[0.5, 1, 5]} position={[4.5, 1, 0]} />
+      {/* Left Guardrail Side */}
+      <group position={[-4.75, 0.8, 0]}>
+        <mesh geometry={railBeamGeometry} material={railMaterial} position={[0, 0.3, 0]} castShadow />
+        <mesh geometry={railBeamGlowGeometry} material={railGlowMaterial} position={[0, 0.3, 0]} />
+        <mesh geometry={railPostGeometry} material={railPostMaterial} position={[0, -0.3, -4.5]} castShadow />
+        <mesh geometry={railPostGeometry} material={railPostMaterial} position={[0, -0.3, 0]} castShadow />
+        <mesh geometry={railPostGeometry} material={railPostMaterial} position={[0, -0.3, 4.5]} castShadow />
+      </group>
+      <CuboidCollider args={[0.3, 1.2, 5]} position={[-4.75, 1, 0]} />
+
+      {/* Right Guardrail Side */}
+      <group position={[4.75, 0.8, 0]}>
+        <mesh geometry={railBeamGeometry} material={railMaterial} position={[0, 0.3, 0]} castShadow />
+        <mesh geometry={railBeamGlowGeometry} material={railGlowMaterial} position={[0, 0.3, 0]} />
+        <mesh geometry={railPostGeometry} material={railPostMaterial} position={[0, -0.3, -4.5]} castShadow />
+        <mesh geometry={railPostGeometry} material={railPostMaterial} position={[0, -0.3, 0]} castShadow />
+        <mesh geometry={railPostGeometry} material={railPostMaterial} position={[0, -0.3, 4.5]} castShadow />
+      </group>
+      <CuboidCollider args={[0.3, 1.2, 5]} position={[4.75, 1, 0]} />
     </>
   )
 }
@@ -76,10 +108,23 @@ function SafetyBumpers() {
 function GapSafetyBumpers() {
   return (
     <>
-      <mesh geometry={gapBumperGeometry} material={bumperMaterial} position={[-4.5, 1, 0]} />
-      <CuboidCollider args={[0.5, 1, 1.6]} position={[-4.5, 1, 0]} />
-      <mesh geometry={gapBumperGeometry} material={bumperMaterial} position={[4.5, 1, 0]} />
-      <CuboidCollider args={[0.5, 1, 1.6]} position={[4.5, 1, 0]} />
+      {/* Left Platform Guardrail */}
+      <group position={[-4.75, 0.8, 0]}>
+        <mesh geometry={gapRailBeamGeometry} material={railMaterial} position={[0, 0.3, 0]} castShadow />
+        <mesh geometry={gapRailBeamGlowGeometry} material={railGlowMaterial} position={[0, 0.3, 0]} />
+        <mesh geometry={railPostGeometry} material={railPostMaterial} position={[0, -0.3, -1.2]} castShadow />
+        <mesh geometry={railPostGeometry} material={railPostMaterial} position={[0, -0.3, 1.2]} castShadow />
+      </group>
+      <CuboidCollider args={[0.3, 1.2, 1.6]} position={[-4.75, 1, 0]} />
+
+      {/* Right Platform Guardrail */}
+      <group position={[4.75, 0.8, 0]}>
+        <mesh geometry={gapRailBeamGeometry} material={railMaterial} position={[0, 0.3, 0]} castShadow />
+        <mesh geometry={gapRailBeamGlowGeometry} material={railGlowMaterial} position={[0, 0.3, 0]} />
+        <mesh geometry={railPostGeometry} material={railPostMaterial} position={[0, -0.3, -1.2]} castShadow />
+        <mesh geometry={railPostGeometry} material={railPostMaterial} position={[0, -0.3, 1.2]} castShadow />
+      </group>
+      <CuboidCollider args={[0.3, 1.2, 1.6]} position={[4.75, 1, 0]} />
     </>
   )
 }
@@ -137,6 +182,8 @@ function GapRoadsideTrees({ chunkIndex = 0 }) {
 
 export function BasicChunk({ position, chunk }) {
   const isSafeMode = useGameStore((state) => state.mechanicalDeaths >= 6)
+  const guardrails = useGameStore((state) => state.guardrails)
+  const showGuardrails = isSafeMode || guardrails
   const chunkIndex = Math.abs(Math.round(position[2] / 10))
 
   return (
@@ -147,7 +194,7 @@ export function BasicChunk({ position, chunk }) {
         {/* White Edge Lines / Kerbs */}
         <mesh geometry={kerbGeometry} material={kerbMaterial} position={[-4.75, 0.05, 0]} receiveShadow />
         <mesh geometry={kerbGeometry} material={kerbMaterial} position={[4.75, 0.05, 0]} receiveShadow />
-        {isSafeMode && <SafetyBumpers />}
+        {showGuardrails && <SafetyBumpers />}
       </RigidBody>
 
       {/* Roadside Trees and Grass */}
@@ -162,6 +209,8 @@ export function BasicChunk({ position, chunk }) {
 
 export function GapChunk({ position, chunk }) {
   const isSafeMode = useGameStore((state) => state.mechanicalDeaths >= 6)
+  const guardrails = useGameStore((state) => state.guardrails)
+  const showGuardrails = isSafeMode || guardrails
   const chunkIndex = Math.abs(Math.round(position[2] / 10))
 
   return (
@@ -180,7 +229,7 @@ export function GapChunk({ position, chunk }) {
         {/* Red warning beacon posts */}
         <mesh geometry={beaconGeometry} material={beaconMaterial} position={[-4.6, 0.8, -1.4]} />
         <mesh geometry={beaconGeometry} material={beaconMaterial} position={[4.6, 0.8, -1.4]} />
-        {isSafeMode && <GapSafetyBumpers />}
+        {showGuardrails && <GapSafetyBumpers />}
       </RigidBody>
 
       {/* Back Platform (Z = -3.4) */}
@@ -193,7 +242,7 @@ export function GapChunk({ position, chunk }) {
         {/* Red warning beacon posts */}
         <mesh geometry={beaconGeometry} material={beaconMaterial} position={[-4.6, 0.8, 1.4]} />
         <mesh geometry={beaconGeometry} material={beaconMaterial} position={[4.6, 0.8, 1.4]} />
-        {isSafeMode && <GapSafetyBumpers />}
+        {showGuardrails && <GapSafetyBumpers />}
       </RigidBody>
 
       {/* Open Chasm with split trees/grass on the platforms */}

@@ -5,6 +5,8 @@ export function SettingsModal() {
   const [isOpen, setIsOpen] = useState(false)
   const cameraPreset = useGameStore((state) => state.cameraPreset) || 'low'
   const setCameraPreset = useGameStore((state) => state.setCameraPreset)
+  const guardrails = useGameStore((state) => state.guardrails)
+  const toggleGuardrails = useGameStore((state) => state.toggleGuardrails)
 
   const cameraPresets = [
     {
@@ -120,6 +122,86 @@ export function SettingsModal() {
               >
                 ✖
               </button>
+            </div>
+
+            {/* Accessibility & Gameplay Options */}
+            <div>
+              <div style={{
+                color: '#38bdf8',
+                fontSize: '1rem',
+                fontWeight: 'bold',
+                marginBottom: '0.6rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+              }}>
+                <span>🛡️</span>
+                <span>Track Safety & Accessibility</span>
+              </div>
+
+              {/* Side Guardrails Toggle Card */}
+              <div
+                onClick={toggleGuardrails}
+                style={{
+                  backgroundColor: guardrails ? 'rgba(56, 189, 248, 0.15)' : '#111827',
+                  border: guardrails ? '2px solid #38bdf8' : '1px solid #374151',
+                  borderRadius: '0.8rem',
+                  padding: '0.9rem 1.1rem',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  transition: 'all 0.2s ease',
+                  boxShadow: guardrails ? '0 0 14px rgba(56, 189, 248, 0.3)' : 'none',
+                }}
+              >
+                <div style={{ paddingRight: '1rem' }}>
+                  <div style={{
+                    fontWeight: 'bold',
+                    fontSize: '1rem',
+                    color: guardrails ? '#38bdf8' : '#ffffff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                  }}>
+                    <span>🛡️ Side Guardrails</span>
+                    <span style={{
+                      fontSize: '0.75rem',
+                      background: guardrails ? '#0284c7' : '#374151',
+                      color: '#ffffff',
+                      padding: '0.1rem 0.4rem',
+                      borderRadius: '0.3rem',
+                    }}>
+                      {guardrails ? 'ON' : 'OFF'}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '0.82rem', color: '#9ca3af', marginTop: '0.25rem', lineHeight: '1.3' }}>
+                    Prevents falling off the <strong>left & right sides</strong> of the road. (Road gaps still require jumping!)
+                  </div>
+                </div>
+
+                {/* Switch Toggle UI */}
+                <div style={{
+                  width: '3.2rem',
+                  height: '1.8rem',
+                  borderRadius: '1rem',
+                  backgroundColor: guardrails ? '#38bdf8' : '#374151',
+                  padding: '0.2rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: guardrails ? 'flex-end' : 'flex-start',
+                  transition: 'all 0.2s ease',
+                  flexShrink: 0,
+                }}>
+                  <div style={{
+                    width: '1.4rem',
+                    height: '1.4rem',
+                    borderRadius: '50%',
+                    backgroundColor: '#ffffff',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                  }} />
+                </div>
+              </div>
             </div>
 
             {/* Camera Presets Section */}
