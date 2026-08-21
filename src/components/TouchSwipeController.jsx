@@ -115,8 +115,8 @@ export function TouchSwipeController() {
       style={{
         position: 'absolute',
         top: '6rem', // Leave top HUD buttons clickable
-        left: 0,
-        right: '10rem', // Leave right Jump/Run action buttons clickable
+        left: '7.5rem', // Leave left RUN button clickable
+        right: '7.5rem', // Leave right JUMP button clickable
         bottom: 0,
         zIndex: 5,
         touchAction: 'none',

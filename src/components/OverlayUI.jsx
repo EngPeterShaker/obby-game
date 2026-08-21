@@ -389,18 +389,14 @@ export function OverlayUI() {
             </div>
           )}
 
-          {/* On-screen Controls (Run & Jump) */}
+          {/* Bottom-Left: Run / Sprint Button (Left Thumb) */}
           <div style={{
             position: 'absolute',
-            bottom: '2rem',
-            right: '2rem',
-            display: 'flex',
-            gap: '1rem',
-            alignItems: 'center',
+            bottom: '1.8rem',
+            left: '1.8rem',
             pointerEvents: 'auto',
             zIndex: 20,
           }}>
-            {/* Run / Sprint Button */}
             <button
               onPointerDown={(e) => {
                 e.preventDefault()
@@ -425,29 +421,37 @@ export function OverlayUI() {
                 window.dispatchEvent(new KeyboardEvent('keyup', { code: 'KeyR', key: 'r', bubbles: true }))
               }}
               style={{
-                width: '4.8rem',
-                height: '4.8rem',
+                width: 'clamp(4.2rem, 11vw, 5.2rem)',
+                height: 'clamp(4.2rem, 11vw, 5.2rem)',
                 borderRadius: '50%',
                 backgroundColor: 'rgba(59, 130, 246, 0.85)',
                 color: 'white',
                 border: '3px solid white',
-                fontSize: '1rem',
+                fontSize: '0.95rem',
                 fontWeight: 'bold',
                 cursor: 'pointer',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
                 alignItems: 'center',
-                boxShadow: '0 4px 14px rgba(0,0,0,0.4)',
+                boxShadow: '0 4px 16px rgba(59, 130, 246, 0.5)',
                 userSelect: 'none',
                 touchAction: 'none',
               }}
             >
-              <span>🏃</span>
+              <span style={{ fontSize: '1.4rem' }}>🏃</span>
               <span>RUN</span>
             </button>
+          </div>
 
-            {/* Jump Button */}
+          {/* Bottom-Right: Jump Button (Right Thumb) */}
+          <div style={{
+            position: 'absolute',
+            bottom: '1.8rem',
+            right: '1.8rem',
+            pointerEvents: 'auto',
+            zIndex: 20,
+          }}>
             <button
               onPointerDown={(e) => {
                 e.preventDefault()
@@ -458,25 +462,25 @@ export function OverlayUI() {
                 window.dispatchEvent(new KeyboardEvent('keyup', { code: 'KeyJ', key: 'j', bubbles: true }))
               }}
               style={{
-                width: '5.5rem',
-                height: '5.5rem',
+                width: 'clamp(4.8rem, 12vw, 5.8rem)',
+                height: 'clamp(4.8rem, 12vw, 5.8rem)',
                 borderRadius: '50%',
                 backgroundColor: 'rgba(34, 197, 94, 0.85)',
                 color: 'white',
                 border: '3px solid white',
-                fontSize: '1.1rem',
+                fontSize: '1.05rem',
                 fontWeight: 'bold',
                 cursor: 'pointer',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
                 alignItems: 'center',
-                boxShadow: '0 4px 14px rgba(0,0,0,0.4)',
+                boxShadow: '0 4px 16px rgba(34, 197, 94, 0.5)',
                 userSelect: 'none',
                 touchAction: 'none',
               }}
             >
-              <span>⬆️</span>
+              <span style={{ fontSize: '1.5rem' }}>⬆️</span>
               <span>JUMP</span>
             </button>
           </div>
