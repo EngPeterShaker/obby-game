@@ -3,6 +3,17 @@ import { persist } from 'zustand/middleware'
 import { getChunkWeights, pickChunkType, applyCognitiveStrike, pickNextWord, getTierRewardAction } from './gameStore.logic.js'
 import vocabData from '../data/vocabulary.json'
 
+// Export partialize function separately for testing purposes
+export const partializeGameState = (state) => ({
+  unlockedColors: state.unlockedColors,
+  equippedColor: state.equippedColor,
+  unlockedTrails: state.unlockedTrails,
+  equippedTrail: state.equippedTrail,
+  masteredWords: state.masteredWords,
+  totalCoins: state.totalCoins,
+  currentTier: state.currentTier,
+})
+
 export const useGameStore = create(
   persist(
     (set, get) => ({
@@ -126,15 +137,7 @@ export const useGameStore = create(
     }),
     {
       name: 'obby-save-data',
-      partialize: (state) => ({
-        unlockedColors: state.unlockedColors,
-        equippedColor: state.equippedColor,
-        unlockedTrails: state.unlockedTrails,
-        equippedTrail: state.equippedTrail,
-        masteredWords: state.masteredWords,
-        totalCoins: state.totalCoins,
-        currentTier: state.currentTier,
-      }),
+      partialize: partializeGameState,
     }
   )
 )

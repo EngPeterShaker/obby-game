@@ -1,17 +1,9 @@
 import { describe, it, expect } from 'vitest'
+import { partializeGameState } from './gameStore.js'
 
-// Test the partialize function directly by extracting and testing it
+// Test the ACTUAL partialize function exported from gameStore.js
 describe('gameStore persist partialize', () => {
-  // Define the partialize function exactly as it appears in gameStore.js
-  const partialize = (state) => ({
-    unlockedColors: state.unlockedColors,
-    equippedColor: state.equippedColor,
-    unlockedTrails: state.unlockedTrails,
-    equippedTrail: state.equippedTrail,
-    masteredWords: state.masteredWords,
-    totalCoins: state.totalCoins,
-    currentTier: state.currentTier,
-  })
+  const partialize = partializeGameState
 
   it('should only persist the 7 cosmetic fields', () => {
     // Create a mock state with all fields
