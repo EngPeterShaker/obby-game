@@ -21,4 +21,15 @@ export const useGameStore = create((set, get) => ({
   // Transient physics-loop state — mutated directly via getState(), never set()
   playerZ: 0,
   activeChunks: [],
+
+  // Actions
+  die: () => set((state) => ({
+    gameState: 'dead',
+    mechanicalDeaths: state.mechanicalDeaths + 1,
+  })),
+
+  // Note: restart() does not yet call spawnInitialChunks() — that action is
+  // added in Task 9 once chunks exist. This task's restart only handles
+  // gameState/inventory; Task 9 extends it.
+  restart: () => set({ gameState: 'playing', inventory: [] }),
 }))
