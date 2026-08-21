@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+import * as THREE from 'three'
+import { useFrame } from '@react-three/fiber'
 import { useSpring, animated } from '@react-spring/three'
 import { RigidBody, CuboidCollider } from '@react-three/rapier'
-import { Text } from '@react-three/drei'
+import { Text, Billboard } from '@react-three/drei'
 import { useGameStore } from '../store/gameStore.js'
 import { useCollectSound } from '../audio/sounds.js'
 
@@ -10,6 +12,7 @@ export function Collectible({ letter, position }) {
   const [unmounted, setUnmounted] = useState(false)
   const collectLetter = useGameStore((state) => state.collectLetter)
   const [playCollect] = useCollectSound()
+  const floatGroupRef = useRef()
 
   const { scale } = useSpring({
     scale: collected ? 0 : 1,
@@ -19,12 +22,19 @@ export function Collectible({ letter, position }) {
     },
   })
 
+  useFrame(({ clock }) => {
+    if (floatGroupRef.current && !collected) {
+      // Gentle bobbing up and down
+      floatGroupRef.current.position.y = Math.sin(clock.getElapsedTime() * 3) * 0.2
+    }
+  })
+
   if (unmounted) return null
 
   return (
     <RigidBody type="fixed" position={position} colliders={false}>
       <CuboidCollider
-        args={[0.5, 0.5, 0.5]}
+        args={[0.8, 0.8, 0.8]}
         sensor
         onIntersectionEnter={() => {
           if (!collected) {
@@ -35,9 +45,26 @@ export function Collectible({ letter, position }) {
         }}
       />
       <animated.group scale={scale}>
-        <Text fontSize={1.5} color="gold">
-          {letter}
-        </Text>
+        <group ref={floatGroupRef}>
+          <Billboard>
+            <Text
+              fontSize={1.8}
+              color="#ffd700"
+              anchorX="center"
+              anchorY="middle"
+              outlineWidth={0.1}
+              outlineColor="#4a2500"
+              material-side={THREE.DoubleSide}
+            >
+              {letter}
+            </Text>
+          </Billboard>
+          {/* Subtle glowing ring underneath the floating letter */}
+          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.6, 0]}>
+            <ringGeometry args={[0.5, 0.75, 32]} />
+            <meshBasicMaterial color="#ffd700" side={THREE.DoubleSide} transparent opacity={0.6} />
+          </mesh>
+        </group>
       </animated.group>
     </RigidBody>
   )

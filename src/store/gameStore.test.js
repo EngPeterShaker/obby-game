@@ -19,6 +19,16 @@ describe('spawnInitialChunks', () => {
     const chunks = useGameStore.getState().activeChunks
     expect(chunks.every((c) => c.type === 'basic')).toBe(true)
   })
+
+  it('spawns letters on initial runway chunks so player can collect letters immediately', () => {
+    useGameStore.setState({ targetWord: 'CAT', inventory: [] })
+    useGameStore.getState().spawnInitialChunks()
+    const chunks = useGameStore.getState().activeChunks
+    const chunksWithLetters = chunks.filter((c) => c.hasLetter && c.letter !== null)
+    expect(chunksWithLetters.length).toBeGreaterThan(0)
+    // Chunk 0 (spawn point) should not spawn a letter directly on top of the player
+    expect(chunks[0].hasLetter).toBe(false)
+  })
 })
 
 describe('progressLevel', () => {

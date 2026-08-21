@@ -53,14 +53,26 @@ export const useGameStore = create(
     get().spawnInitialChunks()
   },
 
-  spawnInitialChunks: () => set(() => {
-    const chunks = Array.from({ length: 10 }, (_, i) => ({
-      id: `chunk-init-${i}`,
-      type: 'basic', // onboarding rule: first 10 chunks are always safe (spec §3.6)
-      position: [0, -0.5, i === 0 ? 0 : -i * 10],
-      hasLetter: false,
-      letter: null,
-    }))
+  spawnInitialChunks: () => set((state) => {
+    const chunks = Array.from({ length: 10 }, (_, i) => {
+      let hasLetter = false
+      let letter = null
+      // Chunk 0 is the starting spawn platform (where player lands).
+      // On subsequent chunks (i > 0), spawn letters so the player immediately sees letters down the runway.
+      if (i > 0) {
+        const letterForChunk = pickLetterForChunk(state.targetWord, state.inventory.length)
+        // Guarantee letters on early chunks (e.g. chunk 2) and 50% chance on others
+        hasLetter = letterForChunk !== null && (i === 2 || Math.random() < 0.5)
+        letter = hasLetter ? letterForChunk : null
+      }
+      return {
+        id: `chunk-init-${Date.now()}-${i}`,
+        type: 'basic', // onboarding rule: first 10 chunks are always safe (spec §3.6)
+        position: [0, -0.5, i === 0 ? 0 : -i * 10],
+        hasLetter,
+        letter,
+      }
+    })
     return { activeChunks: chunks }
   }),
 
