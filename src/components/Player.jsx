@@ -55,7 +55,7 @@ export function Player() {
 
     // Allow jump whenever character is near road level and not already shooting upwards
     if (justPressedJump && gameState === 'playing' && y >= -1.5 && velY < 2.0) {
-      rigidBodyRef.current.setLinvel({ x: velX, y: 5.5, z: velZ }, true)
+      rigidBodyRef.current.setLinvel({ x: velX, y: 7.0, z: velZ }, true)
       setDustActive(true)
       clearTimeout(dustRearmTimeoutRef.current)
       dustRearmTimeoutRef.current = setTimeout(() => setDustActive(false), 200)
@@ -91,8 +91,9 @@ export function Player() {
       characterInitDir={Math.PI}
       camInitDis={-6}
       camMaxDis={-8}
-      maxVelLimit={6}
-      jumpVel={5.5}
+      maxVelLimit={6.5}
+      sprintMult={2.2}
+      jumpVel={7.0}
       animated={false}
     >
       {equippedTrail ? (

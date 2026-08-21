@@ -220,42 +220,82 @@ export function OverlayUI() {
             </div>
           )}
 
-          {/* On-screen Jump Button */}
-          <button
-            onPointerDown={(e) => {
-              e.preventDefault()
-              window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyJ', key: 'j', bubbles: true }))
-            }}
-            onPointerUp={(e) => {
-              e.preventDefault()
-              window.dispatchEvent(new KeyboardEvent('keyup', { code: 'KeyJ', key: 'j', bubbles: true }))
-            }}
-            style={{
-              position: 'absolute',
-              bottom: '2rem',
-              right: '2rem',
-              width: '5.5rem',
-              height: '5.5rem',
-              borderRadius: '50%',
-              backgroundColor: 'rgba(34, 197, 94, 0.85)',
-              color: 'white',
-              border: '3px solid white',
-              fontSize: '1.1rem',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              pointerEvents: 'auto',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-              boxShadow: '0 4px 14px rgba(0,0,0,0.4)',
-              userSelect: 'none',
-              touchAction: 'none',
-            }}
-          >
-            <span>⬆️</span>
-            <span>JUMP</span>
-          </button>
+          {/* On-screen Controls (Run & Jump) */}
+          <div style={{
+            position: 'absolute',
+            bottom: '2rem',
+            right: '2rem',
+            display: 'flex',
+            gap: '1rem',
+            alignItems: 'center',
+            pointerEvents: 'auto',
+          }}>
+            {/* Run / Sprint Button */}
+            <button
+              onPointerDown={(e) => {
+                e.preventDefault()
+                window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyR', key: 'r', bubbles: true }))
+              }}
+              onPointerUp={(e) => {
+                e.preventDefault()
+                window.dispatchEvent(new KeyboardEvent('keyup', { code: 'KeyR', key: 'r', bubbles: true }))
+              }}
+              style={{
+                width: '4.8rem',
+                height: '4.8rem',
+                borderRadius: '50%',
+                backgroundColor: 'rgba(59, 130, 246, 0.85)',
+                color: 'white',
+                border: '3px solid white',
+                fontSize: '1rem',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                boxShadow: '0 4px 14px rgba(0,0,0,0.4)',
+                userSelect: 'none',
+                touchAction: 'none',
+              }}
+            >
+              <span>🏃</span>
+              <span>RUN</span>
+            </button>
+
+            {/* Jump Button */}
+            <button
+              onPointerDown={(e) => {
+                e.preventDefault()
+                window.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyJ', key: 'j', bubbles: true }))
+              }}
+              onPointerUp={(e) => {
+                e.preventDefault()
+                window.dispatchEvent(new KeyboardEvent('keyup', { code: 'KeyJ', key: 'j', bubbles: true }))
+              }}
+              style={{
+                width: '5.5rem',
+                height: '5.5rem',
+                borderRadius: '50%',
+                backgroundColor: 'rgba(34, 197, 94, 0.85)',
+                color: 'white',
+                border: '3px solid white',
+                fontSize: '1.1rem',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                boxShadow: '0 4px 14px rgba(0,0,0,0.4)',
+                userSelect: 'none',
+                touchAction: 'none',
+              }}
+            >
+              <span>⬆️</span>
+              <span>JUMP</span>
+            </button>
+          </div>
         </>
       )}
 
