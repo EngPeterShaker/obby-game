@@ -4,6 +4,10 @@ import { getChunkWeights, pickChunkType, applyCognitiveStrike, pickNextWord, get
 import vocabData from '../data/vocabulary.json'
 import { useCustomWordsStore } from './customWordsStore.js'
 
+// Recomputes the built-in/added/hidden merge fresh on every call instead of
+// memoizing — the merge is just a filter+spread over small arrays, so it's cheap,
+// and correctness (always reflecting the latest custom-words state) matters more
+// than optimizing a path that isn't performance-critical.
 function getCurrentVocab() {
   const customWords = useCustomWordsStore.getState()
   return getEffectiveVocabulary(vocabData, customWords)
