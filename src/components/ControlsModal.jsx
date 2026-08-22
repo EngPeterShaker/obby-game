@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 
-export function ControlsModal() {
-  const [isOpen, setIsOpen] = useState(false)
+export function ControlsModal({ isOpen, onClose }) {
   const [activeTab, setActiveTab] = useState('laptop') // 'laptop' | 'mobile'
 
   useEffect(() => {
@@ -21,35 +20,6 @@ export function ControlsModal() {
 
   return (
     <>
-      {/* Floating Controls Button */}
-      <button
-        onClick={() => setIsOpen(true)}
-        style={{
-          position: 'absolute',
-          top: '1rem',
-          right: '1rem',
-          zIndex: 30,
-          pointerEvents: 'auto',
-          backgroundColor: 'rgba(0, 0, 0, 0.75)',
-          backdropFilter: 'blur(8px)',
-          color: '#ffffff',
-          border: '2px solid rgba(255, 255, 255, 0.25)',
-          padding: '0.6rem 1.1rem',
-          borderRadius: '0.8rem',
-          fontSize: '0.95rem',
-          fontWeight: 'bold',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
-          transition: 'transform 0.2s, background-color 0.2s',
-        }}
-      >
-        <span>🎮</span>
-        <span>How to Play & Controls</span>
-      </button>
-
       {/* Modal Dialog */}
       {isOpen && (
         <div
@@ -66,7 +36,7 @@ export function ControlsModal() {
             pointerEvents: 'auto',
           }}
           onClick={(e) => {
-            if (e.target === e.currentTarget) setIsOpen(false)
+            if (e.target === e.currentTarget) onClose()
           }}
         >
           <div
@@ -94,7 +64,7 @@ export function ControlsModal() {
                 <h2 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 'bold' }}>How to Play & Controls</h2>
               </div>
               <button
-                onClick={() => setIsOpen(false)}
+                onClick={onClose}
                 style={{
                   background: 'transparent',
                   border: 'none',
@@ -262,7 +232,7 @@ export function ControlsModal() {
 
             {/* Close Button */}
             <button
-              onClick={() => setIsOpen(false)}
+              onClick={onClose}
               style={{
                 backgroundColor: '#22c55e',
                 color: 'white',

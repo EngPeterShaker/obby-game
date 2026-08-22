@@ -1,6 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useCustomWordsStore } from '../store/customWordsStore.js'
-import { useGameStore } from '../store/gameStore.js'
 import { getEffectiveVocabulary, assignTierByLength } from '../store/gameStore.logic.js'
 import vocabData from '../data/vocabulary.json'
 
@@ -19,9 +18,7 @@ function generateMathProblem() {
   return { a, b, answer: a * b }
 }
 
-export function WordAdminPanel() {
-  const gameState = useGameStore((state) => state.gameState)
-  const [isOpen, setIsOpen] = useState(false)
+export function WordAdminPanel({ isOpen, onClose }) {
   const [unlocked, setUnlocked] = useState(false)
   const [problem, setProblem] = useState(generateMathProblem)
   const [answerInput, setAnswerInput] = useState('')
@@ -40,13 +37,17 @@ export function WordAdminPanel() {
 
   const effectiveVocab = getEffectiveVocabulary(vocabData, { addedWords, hiddenWords })
 
-  function openPanel() {
-    setIsOpen(true)
-    setUnlocked(false)
-    setProblem(generateMathProblem())
-    setAnswerInput('')
-    setGateError('')
-  }
+  // Reset the math gate every time the panel is opened (previously done
+  // inline in this component's own trigger button's onClick before that
+  // button moved out to TopMenu.jsx).
+  useEffect(() => {
+    if (isOpen) {
+      setUnlocked(false)
+      setProblem(generateMathProblem())
+      setAnswerInput('')
+      setGateError('')
+    }
+  }, [isOpen])
 
   function checkGate() {
     if (Number(answerInput) === problem.answer) {
@@ -102,38 +103,7 @@ export function WordAdminPanel() {
     }
   }
 
-  if (gameState !== 'lobby') return null
-
-  if (!isOpen) {
-    return (
-      <button
-        onClick={openPanel}
-        style={{
-          position: 'absolute',
-          top: '1rem',
-          right: '30rem',
-          zIndex: 30,
-          pointerEvents: 'auto',
-          backgroundColor: 'rgba(0, 0, 0, 0.75)',
-          backdropFilter: 'blur(8px)',
-          color: '#ffffff',
-          border: '2px solid rgba(255, 255, 255, 0.25)',
-          padding: '0.6rem 1.1rem',
-          borderRadius: '0.8rem',
-          fontSize: '0.95rem',
-          fontWeight: 'bold',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.4rem',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
-        }}
-      >
-        <span>🔒</span>
-        <span>Word Admin</span>
-      </button>
-    )
-  }
+  if (!isOpen) return null
 
   return (
     <div
@@ -150,7 +120,7 @@ export function WordAdminPanel() {
         pointerEvents: 'auto',
       }}
       onClick={(e) => {
-        if (e.target === e.currentTarget) setIsOpen(false)
+        if (e.target === e.currentTarget) onClose()
       }}
     >
       <div
@@ -173,7 +143,7 @@ export function WordAdminPanel() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h2 style={{ margin: 0, fontSize: '1.4rem' }}>🔒 Parent Access</h2>
           <button
-            onClick={() => setIsOpen(false)}
+            onClick={onClose}
             style={{ background: 'transparent', border: 'none', color: '#9ca3af', fontSize: '1.4rem', cursor: 'pointer' }}
           >
             ✖

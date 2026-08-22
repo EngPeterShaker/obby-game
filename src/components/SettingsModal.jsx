@@ -1,8 +1,6 @@
-import { useState } from 'react'
 import { useGameStore } from '../store/gameStore.js'
 
-export function SettingsModal() {
-  const [isOpen, setIsOpen] = useState(false)
+export function SettingsModal({ isOpen, onClose }) {
   const cameraPreset = useGameStore((state) => state.cameraPreset) || 'low'
   const setCameraPreset = useGameStore((state) => state.setCameraPreset)
   const guardrails = useGameStore((state) => state.guardrails)
@@ -37,35 +35,6 @@ export function SettingsModal() {
 
   return (
     <>
-      {/* Floating Settings Button in Top-Right */}
-      <button
-        onClick={() => setIsOpen(true)}
-        style={{
-          position: 'absolute',
-          top: '1rem',
-          right: '15.5rem',
-          zIndex: 30,
-          pointerEvents: 'auto',
-          backgroundColor: 'rgba(0, 0, 0, 0.75)',
-          backdropFilter: 'blur(8px)',
-          color: '#ffffff',
-          border: '2px solid rgba(255, 255, 255, 0.25)',
-          padding: '0.6rem 1.1rem',
-          borderRadius: '0.8rem',
-          fontSize: '0.95rem',
-          fontWeight: 'bold',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.4rem',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
-          transition: 'transform 0.2s, background-color 0.2s',
-        }}
-      >
-        <span>⚙️</span>
-        <span>Settings</span>
-      </button>
-
       {/* Settings Modal Dialog */}
       {isOpen && (
         <div
@@ -82,7 +51,7 @@ export function SettingsModal() {
             pointerEvents: 'auto',
           }}
           onClick={(e) => {
-            if (e.target === e.currentTarget) setIsOpen(false)
+            if (e.target === e.currentTarget) onClose()
           }}
         >
           <div
@@ -110,7 +79,7 @@ export function SettingsModal() {
                 <h2 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 'bold' }}>Game Settings</h2>
               </div>
               <button
-                onClick={() => setIsOpen(false)}
+                onClick={onClose}
                 style={{
                   background: 'transparent',
                   border: 'none',
@@ -331,7 +300,7 @@ export function SettingsModal() {
 
             {/* Close Button */}
             <button
-              onClick={() => setIsOpen(false)}
+              onClick={onClose}
               style={{
                 backgroundColor: '#22c55e',
                 color: 'white',
