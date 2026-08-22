@@ -32,8 +32,32 @@ export function applyCognitiveStrike(state, vocabData) {
   return { cognitiveStrikes: 0, currentTier: downgradedTier, targetWord: nextWord }
 }
 
-export function getTierRewardAction(tier, vocabData) {
-  return vocabData[tier].tierReward
+// Picks a reward for completing a word in `tier`. `unlocked` is
+// { colors: string[], trails: string[] } — the player's current unlocked
+// sets, used to prefer a reward the player doesn't have yet over the
+// tier's whole pool.
+//
+// Returns { type, value, label, isNew }. `isNew` tells the caller whether
+// to actually push `value` into the relevant unlocked array (true) or just
+// re-equip an already-owned item as a "remix" once every reward in the
+// tier's pool has been claimed (false) — this is what prevents repeat
+// completions from pushing duplicate entries into
+// unlockedColors/unlockedTrails.
+export function getRewardPool(tier, vocabData) {
+  return vocabData[tier].rewardPool
+}
+
+export function pickReward(tier, unlocked, vocabData) {
+  const pool = getRewardPool(tier, vocabData)
+
+  const isUnlocked = (reward) =>
+    (reward.type === 'color' ? unlocked.colors : unlocked.trails).includes(reward.value)
+
+  const locked = pool.filter((reward) => !isUnlocked(reward))
+  const candidates = locked.length > 0 ? locked : pool
+  const reward = candidates[Math.floor(Math.random() * candidates.length)]
+
+  return { ...reward, isNew: locked.length > 0 }
 }
 
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -80,7 +104,7 @@ export function getEffectiveVocabulary(vocabData, customWords) {
       (w) => !hiddenWords.includes(w) && !builtin.includes(w)
     )
     result[tier] = {
-      tierReward: vocabData[tier].tierReward,
+      rewardPool: vocabData[tier].rewardPool,
       words: [...builtin, ...added],
     }
   }

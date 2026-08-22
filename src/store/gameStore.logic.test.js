@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { getChunkWeights, pickChunkType, pickNextWord, applyCognitiveStrike, getTierRewardAction, pickLetterForChunk, assignTierByLength, getEffectiveVocabulary } from './gameStore.logic.js'
+import { getChunkWeights, pickChunkType, pickNextWord, applyCognitiveStrike, pickReward, pickLetterForChunk, assignTierByLength, getEffectiveVocabulary } from './gameStore.logic.js'
 import vocabData from '../data/vocabulary.json'
 
 describe('getChunkWeights', () => {
@@ -87,10 +87,38 @@ describe('applyCognitiveStrike', () => {
   })
 })
 
-describe('getTierRewardAction', () => {
-  it('returns the reward object for the given tier', () => {
-    expect(getTierRewardAction('level_1', vocabData)).toEqual({ type: 'color', value: 'blue' })
-    expect(getTierRewardAction('level_2', vocabData)).toEqual({ type: 'trail', value: 'orange' })
+describe('pickReward', () => {
+  const noneUnlocked = { colors: [], trails: [] }
+
+  it("returns a reward from the tier's pool", () => {
+    const reward = pickReward('level_1', noneUnlocked, vocabData)
+    expect(vocabData.level_1.rewardPool.map((r) => r.value)).toContain(reward.value)
+    expect(reward.type).toBe('color')
+  })
+
+  it('marks the reward isNew when the player does not already have it', () => {
+    const reward = pickReward('level_1', noneUnlocked, vocabData)
+    expect(reward.isNew).toBe(true)
+  })
+
+  it('never returns a reward the player already owns while locked ones remain', () => {
+    const pool = vocabData.level_2.rewardPool // all type: trail
+    const ownsAllButOne = { colors: [], trails: pool.slice(0, -1).map((r) => r.value) }
+    const lastLocked = pool[pool.length - 1].value
+
+    for (let i = 0; i < 20; i++) {
+      const reward = pickReward('level_2', ownsAllButOne, vocabData)
+      expect(reward.value).toBe(lastLocked)
+      expect(reward.isNew).toBe(true)
+    }
+  })
+
+  it('falls back to a random already-owned reward (isNew: false) once the whole pool is unlocked', () => {
+    const pool = vocabData.level_1.rewardPool
+    const ownsEverything = { colors: pool.map((r) => r.value), trails: [] }
+    const reward = pickReward('level_1', ownsEverything, vocabData)
+    expect(pool.map((r) => r.value)).toContain(reward.value)
+    expect(reward.isNew).toBe(false)
   })
 })
 
@@ -153,9 +181,9 @@ describe('assignTierByLength', () => {
 
 describe('getEffectiveVocabulary', () => {
   const baseVocab = {
-    level_1: { tierReward: { type: 'color', value: 'blue' }, words: ['CAT', 'DOG'] },
-    level_2: { tierReward: { type: 'trail', value: 'orange' }, words: ['JUMP'] },
-    level_3: { tierReward: { type: 'color', value: 'gold' }, words: ['SPACE'] },
+    level_1: { rewardPool: [{ type: 'color', value: '#0000ff', label: 'Blue' }], words: ['CAT', 'DOG'] },
+    level_2: { rewardPool: [{ type: 'trail', value: '#ffa500', label: 'Orange' }], words: ['JUMP'] },
+    level_3: { rewardPool: [{ type: 'color', value: '#ffd700', label: 'Gold' }], words: ['SPACE'] },
   }
 
   it('passes through unchanged when no customization exists', () => {
@@ -184,10 +212,10 @@ describe('getEffectiveVocabulary', () => {
     expect(result.level_1.words).toEqual(['CAT', 'DOG'])
   })
 
-  it('passes tierReward through unchanged', () => {
+  it('passes rewardPool through unchanged', () => {
     const customWords = { addedWords: { level_1: [], level_2: [], level_3: [] }, hiddenWords: [] }
     const result = getEffectiveVocabulary(baseVocab, customWords)
-    expect(result.level_1.tierReward).toEqual({ type: 'color', value: 'blue' })
+    expect(result.level_1.rewardPool).toEqual([{ type: 'color', value: '#0000ff', label: 'Blue' }])
   })
 
   it('never produces duplicate words even if addedWords accidentally overlaps with a builtin word', () => {
