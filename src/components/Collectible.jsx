@@ -66,11 +66,6 @@ export function Collectible({ letter, position }) {
               {letter}
             </Text>
           </Billboard>
-          {/* Subtle glowing ring underneath the floating letter */}
-          <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.45, 0]}>
-            <ringGeometry args={[0.35, 0.55, 32]} />
-            <meshBasicMaterial color="#ffd700" side={THREE.DoubleSide} transparent opacity={0.6} />
-          </mesh>
         </group>
       </animated.group>
     </RigidBody>
