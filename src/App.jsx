@@ -10,6 +10,7 @@ import { ShowcasePlayer } from './components/ShowcasePlayer.jsx'
 import { LobbyUI } from './components/LobbyUI.jsx'
 import { TopMenu } from './components/TopMenu.jsx'
 import { SkyHazards } from './components/SkyHazards.jsx'
+import { DuckHazards } from './components/DuckHazards.jsx'
 import { LandscapeGuard } from './components/LandscapeGuard.jsx'
 import { AdaptiveCameraScaler } from './components/AdaptiveCameraScaler.jsx'
 import { TouchSwipeController } from './components/TouchSwipeController.jsx'
@@ -82,6 +83,7 @@ export default function App() {
             <Physics gravity={[0, -9.81, 0]}>
               <LevelManager />
               <Player />
+              <DuckHazards />
               <ContactShadows position={[0, -0.49, 0]} opacity={0.4} scale={10} blur={2} far={10} />
             </Physics>
           )}
