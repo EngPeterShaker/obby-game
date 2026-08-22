@@ -25,6 +25,8 @@ const MENU_ITEMS = [
   { id: 'wordAdmin', icon: '🔒', label: 'Word Admin (Parents)' },
 ]
 
+const SUPPORT_EMAIL = 'peters.shaker@gmail.com'
+
 export function TopMenu() {
   const gameState = useGameStore((state) => state.gameState)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -117,6 +119,30 @@ export function TopMenu() {
                 <span>{item.label}</span>
               </button>
             ))}
+            <a
+              href={`mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent('Obby Game Support')}`}
+              onClick={() => setIsMenuOpen(false)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#ffffff',
+                padding: '0.55rem 0.7rem',
+                borderRadius: '0.6rem',
+                fontSize: '0.9rem',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                textAlign: 'left',
+                textDecoration: 'none',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)' }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
+            >
+              <span>✉️</span>
+              <span>Support</span>
+            </a>
           </div>
         </>
       )}
