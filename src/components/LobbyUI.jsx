@@ -51,7 +51,7 @@ const MODE_OPTIONS = [
   {
     id: 'spelling_en',
     title: 'English Spelling',
-    icon: '🇺🇸',
+    icon: '🔤',
     badge: 'Words',
     desc: 'Spell English words letter by letter',
     color: '#38bdf8',
@@ -59,7 +59,7 @@ const MODE_OPTIONS = [
   {
     id: 'spelling_ar',
     title: 'تهجئة الكلمات العربية',
-    icon: '🇸🇦',
+    icon: 'ع',
     badge: 'عربي',
     desc: 'تهجئة الكلمات العربية من اليمين لليسار',
     color: '#10b981',
@@ -76,7 +76,7 @@ const MODE_OPTIONS = [
     id: 'math_basic',
     title: 'Math Equations',
     icon: '🔢',
-    badge: '1 + 2 = ?',
+    badge: 'Numbers',
     desc: 'Solve arithmetic equations by collecting numbers',
     color: '#a855f7',
   },

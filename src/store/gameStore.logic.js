@@ -7,8 +7,8 @@ export const ARABIC_ALPHABET = [
 ]
 
 export const GAME_MODES = [
-  { id: 'spelling_en', label: 'English Spelling', icon: '🇺🇸', description: 'Spell English words letter by letter' },
-  { id: 'spelling_ar', label: 'تهجئة الكلمات العربية', icon: '🇸🇦', description: 'تهجئة الكلمات العربية من اليمين لليسار' },
+  { id: 'spelling_en', label: 'English Spelling', icon: '🔤', description: 'Spell English words letter by letter' },
+  { id: 'spelling_ar', label: 'تهجئة الكلمات العربية', icon: 'ع', description: 'تهجئة الكلمات العربية من اليمين لليسار' },
   { id: 'vowels_en', label: 'Missing Vowels', icon: '🅰️', description: 'Find and collect the missing vowels (A, E, I, O, U)' },
   { id: 'math_basic', label: 'Math Equations', icon: '🔢', description: 'Solve arithmetic equations by collecting numbers' },
 ]
