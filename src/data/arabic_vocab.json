@@ -1,0 +1,40 @@
+{
+  "level_1": {
+    "rewardPool": [
+      { "type": "color", "value": "#fb7185", "label": "Coral Blush" },
+      { "type": "color", "value": "#fde047", "label": "Lemon Sparkle" },
+      { "type": "color", "value": "#a3e635", "label": "Lime Zest" },
+      { "type": "color", "value": "#5eead4", "label": "Aqua Mint" },
+      { "type": "color", "value": "#93c5fd", "label": "Sky Powder" },
+      { "type": "color", "value": "#d8b4fe", "label": "Lilac Dream" },
+      { "type": "color", "value": "#fdba74", "label": "Peach Glow" },
+      { "type": "color", "value": "#f9a8d4", "label": "Cotton Candy" }
+    ],
+    "words": ["قطة", "كلب", "شمس", "قمر", "نجم", "بيت", "ورد", "نهر", "جبل", "قلم"]
+  },
+  "level_2": {
+    "rewardPool": [
+      { "type": "trail", "value": "#fb923c", "label": "Sunset Streak" },
+      { "type": "trail", "value": "#4ade80", "label": "Emerald Streak" },
+      { "type": "trail", "value": "#38bdf8", "label": "Sky Streak" },
+      { "type": "trail", "value": "#f472b6", "label": "Bubblegum Streak" },
+      { "type": "trail", "value": "#a78bfa", "label": "Violet Streak" },
+      { "type": "trail", "value": "#22d3ee", "label": "Aqua Streak" },
+      { "type": "trail", "value": "#fbbf24", "label": "Amber Streak" }
+    ],
+    "words": ["طائر", "كتاب", "سمكة", "شجرة", "أسد", "أرنب", "سحاب", "حصان", "زهور"]
+  },
+  "level_3": {
+    "rewardPool": [
+      { "type": "color", "value": "#eab308", "label": "Champion Gold" },
+      { "type": "trail", "value": "#f43f5e", "label": "Ruby Blaze" },
+      { "type": "color", "value": "#0ea5e9", "label": "Sapphire Shine" },
+      { "type": "trail", "value": "#a855f7", "label": "Amethyst Rush" },
+      { "type": "color", "value": "#059669", "label": "Jade Legend" },
+      { "type": "trail", "value": "#db2777", "label": "Magenta Comet" },
+      { "type": "color", "value": "#7c3aed", "label": "Cosmic Violet" },
+      { "type": "trail", "value": "#f59e0b", "label": "Solar Flare" }
+    ],
+    "words": ["طائرة", "صاروخ", "كوكب", "حديقة", "مدرسة", "فراشة", "مدينة", "سيارة"]
+  }
+}

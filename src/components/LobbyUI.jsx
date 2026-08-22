@@ -15,7 +15,7 @@ const COLOR_NAMES = {
   '#ec4899': 'Bubblegum Pink',
   '#1e293b': 'Stealth Midnight',
   '#f8fafc': 'Cloud White',
-  // Level 1 reward-pool colors (src/data/vocabulary.json)
+  // Level 1 reward-pool colors
   '#fb7185': 'Coral Blush',
   '#fde047': 'Lemon Sparkle',
   '#a3e635': 'Lime Zest',
@@ -47,8 +47,45 @@ const TRAIL_NAMES = {
   '#f59e0b': 'Solar Flare',
 }
 
+const MODE_OPTIONS = [
+  {
+    id: 'spelling_en',
+    title: 'English Spelling',
+    icon: '🇺🇸',
+    badge: 'Words',
+    desc: 'Spell English words letter by letter',
+    color: '#38bdf8',
+  },
+  {
+    id: 'spelling_ar',
+    title: 'تهجئة الكلمات العربية',
+    icon: '🇸🇦',
+    badge: 'عربي',
+    desc: 'تهجئة الكلمات العربية من اليمين لليسار',
+    color: '#10b981',
+  },
+  {
+    id: 'vowels_en',
+    title: 'Missing Vowels',
+    icon: '🅰️',
+    badge: 'A,E,I,O,U',
+    desc: 'Find and collect missing vowel letters in words',
+    color: '#f59e0b',
+  },
+  {
+    id: 'math_basic',
+    title: 'Math Equations',
+    icon: '🔢',
+    badge: '1 + 2 = ?',
+    desc: 'Solve arithmetic equations by collecting numbers',
+    color: '#a855f7',
+  },
+]
+
 export function LobbyUI() {
   const gameState = useGameStore((state) => state.gameState)
+  const gameMode = useGameStore((state) => state.gameMode || 'spelling_en')
+  const setGameMode = useGameStore((state) => state.setGameMode)
   const unlockedColors = useGameStore((state) => state.unlockedColors)
   const equippedColor = useGameStore((state) => state.equippedColor)
   const equipColor = useGameStore((state) => state.equipColor)
@@ -60,7 +97,7 @@ export function LobbyUI() {
   const setTier = useGameStore((state) => state.setTier)
   const startGame = useGameStore((state) => state.startGame)
 
-  // Active drawer state: 'outfits' | 'levels' | 'trophies' | null
+  // Active drawer state: 'modes' | 'outfits' | 'levels' | 'trophies' | null
   const [activeMenu, setActiveMenu] = useState(null)
 
   if (gameState !== 'lobby') return null
@@ -69,27 +106,28 @@ export function LobbyUI() {
     {
       id: 'level_1',
       title: 'Level 1: Easy',
-      badge: '3 Letters',
-      examples: 'CAT, DOG, SUN, ONE, TEN...',
+      badge: 'Tier 1',
+      examples: gameMode === 'spelling_ar' ? 'قطة, كلب, شمس, قمر...' : gameMode === 'math_basic' ? '2 + 3 = ?, 5 - 2 = ?' : 'CAT, DOG, SUN, ONE, TEN...',
       color: '#22c55e',
     },
     {
       id: 'level_2',
       title: 'Level 2: Medium',
-      badge: '4 Letters',
-      examples: 'JUMP, FAST, BIRD, STAR, FOUR...',
+      badge: 'Tier 2',
+      examples: gameMode === 'spelling_ar' ? 'طائر, كتاب, سمكة, شجرة...' : gameMode === 'math_basic' ? '12 + 6 = ?, 15 - 7 = ?' : 'JUMP, FAST, BIRD, STAR...',
       color: '#eab308',
     },
     {
       id: 'level_3',
       title: 'Level 3: Hard',
-      badge: '5+ Letters',
-      examples: 'SPACE, ROCKET, PLANET, THREE...',
+      badge: 'Tier 3',
+      examples: gameMode === 'spelling_ar' ? 'طائرة, صاروخ, كوكب, حديقة...' : gameMode === 'math_basic' ? '4 × 3 = ?, 25 - 8 = ?' : 'SPACE, ROCKET, PLANET...',
       color: '#ef4444',
     },
   ]
 
   const currentLevelInfo = levelOptions.find((l) => l.id === currentTier) || levelOptions[0]
+  const currentModeInfo = MODE_OPTIONS.find((m) => m.id === gameMode) || MODE_OPTIONS[0]
 
   return (
     <div style={{
@@ -112,58 +150,91 @@ export function LobbyUI() {
         flexDirection: 'column',
         alignItems: 'flex-start',
         gap: '0.6rem',
-        maxWidth: '360px',
+        maxWidth: '420px',
         zIndex: 25,
       }}>
         {/* Toggle Pills Row */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-          {/* Outfits Button */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
+          {/* Game Mode Pill */}
           <button
-            onClick={() => setActiveMenu(activeMenu === 'outfits' ? null : 'outfits')}
+            onClick={() => setActiveMenu(activeMenu === 'modes' ? null : 'modes')}
             style={{
-              backgroundColor: activeMenu === 'outfits' ? '#38bdf8' : 'rgba(0, 0, 0, 0.75)',
-              color: activeMenu === 'outfits' ? '#0f172a' : '#ffffff',
-              border: '2px solid rgba(255, 255, 255, 0.25)',
-              padding: '0.55rem 0.9rem',
+              backgroundColor: activeMenu === 'modes' ? currentModeInfo.color : 'rgba(0, 0, 0, 0.78)',
+              color: activeMenu === 'modes' ? '#0f172a' : '#ffffff',
+              border: `2px solid ${activeMenu === 'modes' ? currentModeInfo.color : 'rgba(255, 255, 255, 0.25)'}`,
+              padding: '0.5rem 0.85rem',
               borderRadius: '0.8rem',
-              fontSize: '0.88rem',
+              fontSize: '0.86rem',
               fontWeight: 'bold',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '0.4rem',
+              gap: '0.35rem',
+              backdropFilter: 'blur(8px)',
+              boxShadow: activeMenu === 'modes' ? `0 0 14px ${currentModeInfo.color}88` : '0 4px 12px rgba(0,0,0,0.3)',
+              transition: 'all 0.15s ease',
+            }}
+          >
+            <span>{currentModeInfo.icon}</span>
+            <span>{currentModeInfo.title.split(' ')[0]}</span>
+            <span style={{
+              fontSize: '0.72rem',
+              background: activeMenu === 'modes' ? 'rgba(0,0,0,0.2)' : currentModeInfo.color,
+              color: activeMenu === 'modes' ? '#000000' : '#000000',
+              padding: '0.1rem 0.3rem',
+              borderRadius: '0.3rem',
+              fontWeight: '900',
+            }}>
+              {currentModeInfo.badge}
+            </span>
+          </button>
+
+          {/* Outfits Button */}
+          <button
+            onClick={() => setActiveMenu(activeMenu === 'outfits' ? null : 'outfits')}
+            style={{
+              backgroundColor: activeMenu === 'outfits' ? '#38bdf8' : 'rgba(0, 0, 0, 0.78)',
+              color: activeMenu === 'outfits' ? '#0f172a' : '#ffffff',
+              border: '2px solid rgba(255, 255, 255, 0.25)',
+              padding: '0.5rem 0.85rem',
+              borderRadius: '0.8rem',
+              fontSize: '0.86rem',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.35rem',
               backdropFilter: 'blur(8px)',
               boxShadow: activeMenu === 'outfits' ? '0 0 14px rgba(56, 189, 248, 0.5)' : '0 4px 12px rgba(0,0,0,0.3)',
               transition: 'all 0.15s ease',
             }}
           >
             <span style={{
-              width: '0.9rem',
-              height: '0.9rem',
+              width: '0.85rem',
+              height: '0.85rem',
               borderRadius: '50%',
               backgroundColor: equippedColor,
               display: 'inline-block',
               border: '1px solid white',
             }} />
             <span>🎨 Outfits</span>
-            <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>({COLOR_NAMES[equippedColor] || 'Custom'})</span>
           </button>
 
           {/* Difficulty Level Button */}
           <button
             onClick={() => setActiveMenu(activeMenu === 'levels' ? null : 'levels')}
             style={{
-              backgroundColor: activeMenu === 'levels' ? currentLevelInfo.color : 'rgba(0, 0, 0, 0.75)',
+              backgroundColor: activeMenu === 'levels' ? currentLevelInfo.color : 'rgba(0, 0, 0, 0.78)',
               color: activeMenu === 'levels' ? '#000000' : '#ffffff',
               border: `2px solid ${activeMenu === 'levels' ? currentLevelInfo.color : 'rgba(255, 255, 255, 0.25)'}`,
-              padding: '0.55rem 0.9rem',
+              padding: '0.5rem 0.85rem',
               borderRadius: '0.8rem',
-              fontSize: '0.88rem',
+              fontSize: '0.86rem',
               fontWeight: 'bold',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '0.4rem',
+              gap: '0.35rem',
               backdropFilter: 'blur(8px)',
               boxShadow: activeMenu === 'levels' ? `0 0 14px ${currentLevelInfo.color}88` : '0 4px 12px rgba(0,0,0,0.3)',
               transition: 'all 0.15s ease',
@@ -171,47 +242,113 @@ export function LobbyUI() {
           >
             <span>📖</span>
             <span>{currentLevelInfo.title.split(':')[0]}</span>
-            <span style={{
-              fontSize: '0.75rem',
-              background: activeMenu === 'levels' ? 'rgba(0,0,0,0.2)' : currentLevelInfo.color,
-              color: activeMenu === 'levels' ? '#000000' : '#000000',
-              padding: '0.1rem 0.35rem',
-              borderRadius: '0.3rem',
-            }}>
-              {currentLevelInfo.badge}
-            </span>
           </button>
 
           {/* Trophies Button */}
           <button
             onClick={() => setActiveMenu(activeMenu === 'trophies' ? null : 'trophies')}
             style={{
-              backgroundColor: activeMenu === 'trophies' ? '#fbbf24' : 'rgba(0, 0, 0, 0.75)',
+              backgroundColor: activeMenu === 'trophies' ? '#fbbf24' : 'rgba(0, 0, 0, 0.78)',
               color: activeMenu === 'trophies' ? '#000000' : '#ffffff',
               border: '2px solid rgba(255, 255, 255, 0.25)',
-              padding: '0.55rem 0.9rem',
+              padding: '0.5rem 0.85rem',
               borderRadius: '0.8rem',
-              fontSize: '0.88rem',
+              fontSize: '0.86rem',
               fontWeight: 'bold',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '0.4rem',
+              gap: '0.35rem',
               backdropFilter: 'blur(8px)',
               boxShadow: activeMenu === 'trophies' ? '0 0 14px rgba(251, 191, 36, 0.5)' : '0 4px 12px rgba(0,0,0,0.3)',
               transition: 'all 0.15s ease',
             }}
           >
             <span>🏆</span>
-            <span>Trophies</span>
-            <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>({masteredWords.length})</span>
+            <span>({masteredWords.length})</span>
           </button>
         </div>
+
+        {/* On-Click Content Drawer: Game Modes */}
+        {activeMenu === 'modes' && (
+          <div style={{
+            background: 'rgba(0, 0, 0, 0.90)',
+            backdropFilter: 'blur(12px)',
+            padding: '1rem 1.2rem',
+            borderRadius: '1rem',
+            border: `2px solid ${currentModeInfo.color}`,
+            boxShadow: '0 12px 36px rgba(0, 0, 0, 0.6)',
+            width: '100%',
+            animation: 'fadeIn 0.15s ease',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
+              <span style={{ color: '#ffffff', fontWeight: 'bold', fontSize: '0.95rem' }}>
+                🎮 Select Game Mode / Skill:
+              </span>
+              <button
+                onClick={() => setActiveMenu(null)}
+                style={{ background: 'transparent', border: 'none', color: '#9ca3af', cursor: 'pointer', fontSize: '1.1rem' }}
+              >
+                ✖
+              </button>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {MODE_OPTIONS.map((opt) => {
+                const isSelected = gameMode === opt.id
+                return (
+                  <button
+                    key={opt.id}
+                    onClick={() => {
+                      setGameMode(opt.id)
+                      setActiveMenu(null)
+                    }}
+                    style={{
+                      backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.18)' : '#111827',
+                      border: isSelected ? `2px solid ${opt.color}` : '1px solid #374151',
+                      borderRadius: '0.7rem',
+                      padding: '0.6rem 0.8rem',
+                      cursor: 'pointer',
+                      color: 'white',
+                      textAlign: 'left',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      transition: 'all 0.15s ease',
+                      boxShadow: isSelected ? `0 0 12px ${opt.color}66` : 'none',
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontWeight: 'bold', fontSize: '0.92rem', color: opt.color, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <span>{opt.icon}</span>
+                        <span>{opt.title}</span>
+                        {isSelected && <span style={{ color: '#86efac' }}>✓</span>}
+                      </div>
+                      <div style={{ fontSize: '0.76rem', color: '#9ca3af', marginTop: '0.15rem' }}>
+                        {opt.desc}
+                      </div>
+                    </div>
+                    <span style={{
+                      fontSize: '0.75rem',
+                      background: opt.color,
+                      color: '#000000',
+                      fontWeight: 'bold',
+                      padding: '0.15rem 0.45rem',
+                      borderRadius: '0.3rem',
+                      flexShrink: 0,
+                    }}>
+                      {opt.badge}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
 
         {/* On-Click Content Drawer: Outfits */}
         {activeMenu === 'outfits' && (
           <div style={{
-            background: 'rgba(0, 0, 0, 0.88)',
+            background: 'rgba(0, 0, 0, 0.90)',
             backdropFilter: 'blur(12px)',
             padding: '1rem 1.2rem',
             borderRadius: '1rem',
@@ -303,7 +440,7 @@ export function LobbyUI() {
         {/* On-Click Content Drawer: Level / Difficulty */}
         {activeMenu === 'levels' && (
           <div style={{
-            background: 'rgba(0, 0, 0, 0.88)',
+            background: 'rgba(0, 0, 0, 0.90)',
             backdropFilter: 'blur(12px)',
             padding: '1rem 1.2rem',
             borderRadius: '1rem',
@@ -376,7 +513,7 @@ export function LobbyUI() {
         {/* On-Click Content Drawer: Mastered Words Trophies */}
         {activeMenu === 'trophies' && (
           <div style={{
-            background: 'rgba(0, 0, 0, 0.88)',
+            background: 'rgba(0, 0, 0, 0.90)',
             backdropFilter: 'blur(12px)',
             padding: '1rem 1.2rem',
             borderRadius: '1rem',
@@ -389,7 +526,7 @@ export function LobbyUI() {
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
               <span style={{ color: '#fbbf24', fontWeight: 'bold', fontSize: '0.95rem' }}>
-                🏆 Mastered Trophy Words ({masteredWords.length})
+                🏆 Mastered Trophies ({masteredWords.length})
               </span>
               <button
                 onClick={() => setActiveMenu(null)}
@@ -400,7 +537,7 @@ export function LobbyUI() {
             </div>
             {masteredWords.length === 0 ? (
               <div style={{ color: '#9ca3af', fontSize: '0.82rem', lineHeight: '1.4' }}>
-                Spell words during runs to earn star trophies and unlock new outfits!
+                Complete words and equations during runs to earn star trophies and unlock new outfits!
               </div>
             ) : (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>

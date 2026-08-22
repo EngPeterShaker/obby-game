@@ -66,7 +66,7 @@ export function WordAdminPanel({ isOpen, onClose }) {
       setWordError('Enter a word')
       return
     }
-    if (!/^[A-Z]+$/.test(word)) {
+    if (!/^[A-Z\u0600-\u06FF]+$/i.test(word)) {
       setWordError('Letters only')
       return
     }

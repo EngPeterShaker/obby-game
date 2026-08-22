@@ -3,20 +3,24 @@ import { useGameStore } from '../store/gameStore.js'
 import { useDeathSound, useWrongLetterSound, useWinSound } from '../audio/sounds.js'
 
 function WordProgressHUD() {
+  const targetObjective = useGameStore((state) => state.targetObjective)
   const targetWord = useGameStore((state) => state.targetWord)
   const inventory = useGameStore((state) => state.inventory)
   const cognitiveStrikes = useGameStore((state) => state.cognitiveStrikes)
   const masteredWords = useGameStore((state) => state.masteredWords)
+  const gameMode = useGameStore((state) => state.gameMode)
 
   const [isRevealed, setIsRevealed] = useState(true)
   const [peekCountdown, setPeekCountdown] = useState(null)
   const hideTimerRef = useRef(null)
   const countdownIntervalRef = useRef(null)
 
+  const isRtl = targetObjective?.rtl || false
+  const sequence = targetObjective?.sequence || (typeof targetWord === 'string' ? targetWord.split('') : [])
   const nextLetterIndex = inventory.length
-  const nextLetter = targetWord[nextLetterIndex]
+  const nextLetter = sequence[nextLetterIndex]
 
-  // Reveal for 3 seconds on new target word
+  // Reveal for 3 seconds on new target objective
   useEffect(() => {
     setIsRevealed(true)
     setPeekCountdown(3)
@@ -44,11 +48,11 @@ function WordProgressHUD() {
       if (hideTimerRef.current) clearTimeout(hideTimerRef.current)
       if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current)
     }
-  }, [targetWord])
+  }, [targetWord, targetObjective?.display])
 
   // Handle 2-second peek button
   const handlePeek = () => {
-    if (isRevealed && peekCountdown !== null) return // Already peeking
+    if (isRevealed && peekCountdown !== null) return
 
     setIsRevealed(true)
     setPeekCountdown(2)
@@ -73,21 +77,28 @@ function WordProgressHUD() {
     }, 2000)
   }
 
+  // Determine mode header label
+  let headerLabel = '🎯 Target Word'
+  if (gameMode === 'spelling_ar' || isRtl) headerLabel = '🎯 الكلمة المستهدفة'
+  else if (gameMode === 'math_basic') headerLabel = '🔢 Math Challenge'
+  else if (gameMode === 'vowels_en') headerLabel = '🅰️ Missing Vowels'
+
   return (
     <div style={{
       position: 'absolute',
       top: '1rem',
-      left: '1rem',
+      left: isRtl ? 'auto' : '1rem',
+      right: isRtl ? '1rem' : 'auto',
       display: 'flex',
       flexDirection: 'column',
-      alignItems: 'flex-start',
+      alignItems: isRtl ? 'flex-end' : 'flex-start',
       gap: '0.5rem',
       pointerEvents: 'none',
       zIndex: 10,
     }}>
-      {/* Target Word Container (Top-Left) */}
+      {/* Target Container */}
       <div style={{
-        background: 'rgba(0, 0, 0, 0.82)',
+        background: 'rgba(0, 0, 0, 0.84)',
         backdropFilter: 'blur(8px)',
         padding: 'clamp(0.35rem, 0.9vw, 0.5rem) clamp(0.5rem, 1.4vw, 0.85rem)',
         borderRadius: '0.8rem',
@@ -95,7 +106,7 @@ function WordProgressHUD() {
         boxShadow: '0 8px 24px rgba(0, 0, 0, 0.5)',
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'flex-start',
+        alignItems: isRtl ? 'flex-end' : 'flex-start',
       }}>
         <div style={{
           color: '#fbbf24',
@@ -107,8 +118,9 @@ function WordProgressHUD() {
           display: 'flex',
           alignItems: 'center',
           gap: '0.35rem',
+          flexDirection: isRtl ? 'row-reverse' : 'row',
         }}>
-          <span>🎯 Target Word</span>
+          <span>{headerLabel}</span>
           {isRevealed ? (
             <span style={{
               background: '#22c55e',
@@ -132,51 +144,174 @@ function WordProgressHUD() {
           )}
         </div>
 
-        {/* Letter Boxes */}
-        <div style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
-          {targetWord.split('').map((char, index) => {
-            const isCollected = index < inventory.length
-            const isNext = index === nextLetterIndex
+        {/* Challenge Items / Boxes Display */}
+        {gameMode === 'vowels_en' && targetObjective?.displayTokens ? (
+          <div style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
+            {targetObjective.displayTokens.map((token, index) => {
+              let vowelSeqIdx = 0
+              for (let i = 0; i < index; i++) {
+                if (targetObjective.displayTokens[i].isVowel) vowelSeqIdx++
+              }
+              const isCollected = token.isVowel && vowelSeqIdx < inventory.length
+              const isCurrentTarget = token.isVowel && vowelSeqIdx === nextLetterIndex
 
-            return (
-              <div
-                key={index}
-                style={{
-                  width: 'clamp(1.6rem, 3.4vw, 2.3rem)',
-                  height: 'clamp(1.9rem, 4.0vw, 2.6rem)',
-                  borderRadius: '0.45rem',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  fontWeight: '900',
-                  fontSize: 'clamp(0.95rem, 2.2vw, 1.3rem)',
-                  fontFamily: 'monospace',
-                  transition: 'all 0.3s ease',
-                  backgroundColor: isCollected
-                    ? '#16a34a'
-                    : isNext && isRevealed
-                    ? '#eab308'
-                    : isRevealed
-                    ? '#374151'
-                    : '#1f2937',
-                  color: isCollected || (isRevealed && isNext) ? '#ffffff' : isRevealed ? '#9ca3af' : '#6b7280',
-                  border: isNext && isRevealed
-                    ? '2px solid #ffffff'
+              return (
+                <div
+                  key={index}
+                  style={{
+                    width: 'clamp(1.6rem, 3.4vw, 2.3rem)',
+                    height: 'clamp(1.9rem, 4.0vw, 2.6rem)',
+                    borderRadius: '0.45rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    fontWeight: '900',
+                    fontSize: 'clamp(0.95rem, 2.2vw, 1.3rem)',
+                    fontFamily: 'monospace',
+                    transition: 'all 0.3s ease',
+                    backgroundColor: !token.isVowel
+                      ? '#334155'
+                      : isCollected
+                      ? '#16a34a'
+                      : isCurrentTarget && isRevealed
+                      ? '#eab308'
+                      : '#1e293b',
+                    color: !token.isVowel
+                      ? '#f8fafc'
+                      : isCollected || (isRevealed && isCurrentTarget)
+                      ? '#ffffff'
+                      : '#facc15',
+                    border: token.isVowel
+                      ? isCurrentTarget && isRevealed
+                        ? '2px solid #ffffff'
+                        : isCollected
+                        ? '2px solid #86efac'
+                        : '2px dashed #eab308'
+                      : '1.5px solid #64748b',
+                    transform: isCurrentTarget && isRevealed ? 'scale(1.08)' : 'scale(1)',
+                    boxShadow: isCurrentTarget && isRevealed ? '0 0 10px rgba(234, 179, 8, 0.8)' : 'none',
+                  }}
+                >
+                  {!token.isVowel
+                    ? token.char
                     : isCollected
-                    ? '2px solid #86efac'
+                    ? inventory[vowelSeqIdx]
                     : isRevealed
-                    ? '1.5px solid #4b5563'
-                    : '1.5px dashed #4b5563',
-                  transform: isNext && isRevealed ? 'scale(1.08)' : 'scale(1)',
-                  boxShadow: isNext && isRevealed ? '0 0 10px rgba(234, 179, 8, 0.8)' : 'none',
-                }}
-              >
-                {isCollected ? inventory[index] : isRevealed ? char : '?'}
-              </div>
-            )
-          })}
-        </div>
+                    ? token.target
+                    : '?'}
+                </div>
+              )
+            })}
+          </div>
+        ) : gameMode === 'math_basic' ? (
+          <div style={{ display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
+            {String(targetObjective?.display || targetWord).split(' ').map((token, index) => {
+              const isBlank = token === '_'
+              const isCollected = isBlank && inventory.length > 0
+              const isCurrent = isBlank && inventory.length === 0
+
+              return (
+                <div
+                  key={index}
+                  style={{
+                    minWidth: isBlank ? 'clamp(1.8rem, 3.8vw, 2.5rem)' : 'clamp(1.4rem, 2.8vw, 1.8rem)',
+                    height: 'clamp(1.9rem, 4.0vw, 2.6rem)',
+                    padding: '0 0.3rem',
+                    borderRadius: '0.45rem',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    fontWeight: '900',
+                    fontSize: 'clamp(1.05rem, 2.4vw, 1.4rem)',
+                    fontFamily: 'monospace',
+                    transition: 'all 0.3s ease',
+                    backgroundColor: isBlank
+                      ? isCollected
+                        ? '#16a34a'
+                        : isRevealed
+                        ? '#eab308'
+                        : '#1e293b'
+                      : 'transparent',
+                    color: isBlank
+                      ? isCollected || isRevealed
+                        ? '#ffffff'
+                        : '#facc15'
+                      : '#38bdf8',
+                    border: isBlank
+                      ? isCollected
+                        ? '2px solid #86efac'
+                        : isRevealed
+                        ? '2px solid #ffffff'
+                        : '2px dashed #eab308'
+                      : 'none',
+                    transform: isBlank && isCurrent && isRevealed ? 'scale(1.08)' : 'scale(1)',
+                    boxShadow: isBlank && isCurrent && isRevealed ? '0 0 10px rgba(234, 179, 8, 0.8)' : 'none',
+                  }}
+                >
+                  {isBlank
+                    ? isCollected
+                      ? inventory[0]
+                      : isRevealed
+                      ? sequence[0]
+                      : '?'
+                    : token}
+                </div>
+              )
+            })}
+          </div>
+        ) : (
+          /* Standard / Arabic Letter Boxes */
+          <div style={{
+            display: 'flex',
+            gap: '0.3rem',
+            alignItems: 'center',
+            flexDirection: isRtl ? 'row-reverse' : 'row',
+          }}>
+            {sequence.map((char, index) => {
+              const isCollected = index < inventory.length
+              const isNext = index === nextLetterIndex
+
+              return (
+                <div
+                  key={index}
+                  style={{
+                    width: 'clamp(1.6rem, 3.4vw, 2.3rem)',
+                    height: 'clamp(1.9rem, 4.0vw, 2.6rem)',
+                    borderRadius: '0.45rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    fontWeight: '900',
+                    fontSize: isRtl ? 'clamp(1.2rem, 2.8vw, 1.6rem)' : 'clamp(0.95rem, 2.2vw, 1.3rem)',
+                    fontFamily: isRtl ? 'sans-serif' : 'monospace',
+                    transition: 'all 0.3s ease',
+                    backgroundColor: isCollected
+                      ? '#16a34a'
+                      : isNext && isRevealed
+                      ? '#eab308'
+                      : isRevealed
+                      ? '#374151'
+                      : '#1f2937',
+                    color: isCollected || (isRevealed && isNext) ? '#ffffff' : isRevealed ? '#9ca3af' : '#6b7280',
+                    border: isNext && isRevealed
+                      ? '2px solid #ffffff'
+                      : isCollected
+                      ? '2px solid #86efac'
+                      : isRevealed
+                      ? '1.5px solid #4b5563'
+                      : '1.5px dashed #4b5563',
+                    transform: isNext && isRevealed ? 'scale(1.08)' : 'scale(1)',
+                    boxShadow: isNext && isRevealed ? '0 0 10px rgba(234, 179, 8, 0.8)' : 'none',
+                  }}
+                >
+                  {isCollected ? inventory[index] : isRevealed ? char : '?'}
+                </div>
+              )
+            })}
+          </div>
+        )}
 
         {/* Hint or Hidden Notice */}
         <div style={{
@@ -184,17 +319,28 @@ function WordProgressHUD() {
           fontSize: '0.86rem',
           fontWeight: '600',
           color: isRevealed ? '#fef08a' : '#9ca3af',
+          direction: isRtl ? 'rtl' : 'ltr',
         }}>
           {isRevealed && nextLetter ? (
-            <span>Collect letter: <strong style={{ fontSize: '1rem', color: '#ffffff' }}>"{nextLetter}"</strong></span>
+            <span>
+              {isRtl ? 'اجمع الحرف: ' : gameMode === 'math_basic' ? 'Collect answer: ' : gameMode === 'vowels_en' ? 'Collect vowel: ' : 'Collect letter: '}
+              <strong style={{ fontSize: '1.05rem', color: '#ffffff' }}>"{nextLetter}"</strong>
+            </span>
           ) : (
-            <span>🧠 Hidden! Remember the letters</span>
+            <span>{isRtl ? '🧠 مخفية! تذكر الحروف' : '🧠 Hidden! Remember the sequence'}</span>
           )}
         </div>
       </div>
 
       {/* Action Row: Peek Button, Strikes, Mastered Trophy */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', alignItems: 'center', pointerEvents: 'auto' }}>
+      <div style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '0.5rem',
+        alignItems: 'center',
+        pointerEvents: 'auto',
+        flexDirection: isRtl ? 'row-reverse' : 'row',
+      }}>
         {/* Peek Button */}
         <button
           onClick={handlePeek}
@@ -215,10 +361,11 @@ function WordProgressHUD() {
             display: 'flex',
             alignItems: 'center',
             gap: '0.3rem',
+            flexDirection: isRtl ? 'row-reverse' : 'row',
           }}
         >
           <span>💡</span>
-          <span>{isRevealed && peekCountdown ? `Showing (${peekCountdown}s)` : 'Peek Word (2s)'}</span>
+          <span>{isRevealed && peekCountdown ? (isRtl ? `ظاهر (${peekCountdown}ث)` : `Showing (${peekCountdown}s)`) : (isRtl ? 'كشف (ثانيتان)' : 'Peek (2s)')}</span>
         </button>
 
         {/* Strikes Meter */}
@@ -234,8 +381,9 @@ function WordProgressHUD() {
           display: 'flex',
           alignItems: 'center',
           gap: '0.3rem',
+          flexDirection: isRtl ? 'row-reverse' : 'row',
         }}>
-          <span>Strikes:</span>
+          <span>{isRtl ? 'الأخطاء:' : 'Strikes:'}</span>
           <span>{cognitiveStrikes === 0 ? '💚 0/3' : cognitiveStrikes === 1 ? '⚠️ 1/3' : '🚨 2/3'}</span>
         </div>
 

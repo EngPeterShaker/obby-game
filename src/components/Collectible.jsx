@@ -6,6 +6,10 @@ import { RigidBody, CuboidCollider } from '@react-three/rapier'
 import { Text, Billboard } from '@react-three/drei'
 import { useGameStore } from '../store/gameStore.js'
 import { useCollectSound } from '../audio/sounds.js'
+import { isArabic } from '../store/gameStore.logic.js'
+
+// High-quality local Cairo Arabic font for crisp 3D Arabic typography
+const ARABIC_FONT_URL = '/fonts/cairo-arabic.woff'
 
 export function Collectible({ letter, position }) {
   const [collected, setCollected] = useState(false)
@@ -13,6 +17,8 @@ export function Collectible({ letter, position }) {
   const collectLetter = useGameStore((state) => state.collectLetter)
   const [playCollect] = useCollectSound()
   const floatGroupRef = useRef()
+
+  const isAr = isArabic(letter)
 
   const { scale } = useSpring({
     scale: collected ? 0 : 1,
@@ -48,7 +54,8 @@ export function Collectible({ letter, position }) {
         <group ref={floatGroupRef}>
           <Billboard>
             <Text
-              fontSize={1.15}
+              fontSize={isAr ? 1.35 : 1.15}
+              font={isAr ? ARABIC_FONT_URL : undefined}
               color="#ffd700"
               anchorX="center"
               anchorY="middle"

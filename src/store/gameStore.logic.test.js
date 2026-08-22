@@ -225,3 +225,76 @@ describe('getEffectiveVocabulary', () => {
     expect(result.level_1.words.length).toBe(uniqueWords.size)
   })
 })
+
+describe('Multi-mode objectives and generators', () => {
+  it('identifies Arabic text correctly', async () => {
+    const { isArabic } = await import('./gameStore.logic.js')
+    expect(isArabic('قطة')).toBe(true)
+    expect(isArabic('CAT')).toBe(false)
+    expect(isArabic('1 + 2 = 3')).toBe(false)
+  })
+
+  it('normalizes string targets and objective objects properly', async () => {
+    const { normalizeObjective } = await import('./gameStore.logic.js')
+    const eng = normalizeObjective('DOG')
+    expect(eng.mode).toBe('spelling_en')
+    expect(eng.sequence).toEqual(['D', 'O', 'G'])
+    expect(eng.rtl).toBe(false)
+
+    const ar = normalizeObjective('شمس')
+    expect(ar.mode).toBe('spelling_ar')
+    expect(ar.sequence).toEqual(['ش', 'م', 'س'])
+    expect(ar.rtl).toBe(true)
+  })
+
+  it('generates valid math objectives with correct sequences', async () => {
+    const { generateMathObjective } = await import('./gameStore.logic.js')
+    const obj = generateMathObjective('level_1')
+    expect(obj.mode).toBe('math_basic')
+    expect(obj.sequence.length).toBe(1)
+    expect(Number.isInteger(parseInt(obj.sequence[0], 10))).toBe(true)
+    expect(obj.display).toContain('_')
+  })
+
+  it('generates vowel objectives with missing vowel masks', async () => {
+    const { generateVowelObjective } = await import('./gameStore.logic.js')
+    const mockVocab = { level_1: { words: ['CAT'] } }
+    const obj = generateVowelObjective('level_1', [], mockVocab)
+    expect(obj.mode).toBe('vowels_en')
+    expect(obj.sequence).toEqual(['A'])
+    expect(obj.display).toContain('_')
+  })
+
+  it('picks Arabic letter decoys when in Arabic mode', async () => {
+    const { pickLetterForChunk, ARABIC_ALPHABET } = await import('./gameStore.logic.js')
+    const arObj = {
+      mode: 'spelling_ar',
+      display: 'قطة',
+      sequence: ['ق', 'ط', 'ة'],
+      rtl: true,
+    }
+    // Correct next is 'ق'
+    // Decoy roll
+    vi.spyOn(Math, 'random').mockReturnValueOnce(0.1) // force decoy
+    const decoy = pickLetterForChunk(arObj, 0)
+    expect(ARABIC_ALPHABET).toContain(decoy)
+    expect(decoy).not.toBe('ق')
+    vi.restoreAllMocks()
+  })
+
+  it('picks vowel decoys when in vowels mode', async () => {
+    const { pickLetterForChunk, VOWELS } = await import('./gameStore.logic.js')
+    const vowelObj = {
+      mode: 'vowels_en',
+      display: 'C _ T',
+      sequence: ['A'],
+      rtl: false,
+    }
+    vi.spyOn(Math, 'random').mockReturnValueOnce(0.1) // force decoy
+    const decoy = pickLetterForChunk(vowelObj, 0)
+    expect(VOWELS).toContain(decoy)
+    expect(decoy).not.toBe('A')
+    vi.restoreAllMocks()
+  })
+})
+
