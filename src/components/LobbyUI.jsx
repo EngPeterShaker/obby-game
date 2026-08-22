@@ -15,8 +15,36 @@ const COLOR_NAMES = {
   '#ec4899': 'Bubblegum Pink',
   '#1e293b': 'Stealth Midnight',
   '#f8fafc': 'Cloud White',
-  'blue': 'Electric Blue',
-  'gold': 'Champion Gold',
+  // Level 1 reward-pool colors (src/data/vocabulary.json)
+  '#fb7185': 'Coral Blush',
+  '#fde047': 'Lemon Sparkle',
+  '#a3e635': 'Lime Zest',
+  '#5eead4': 'Aqua Mint',
+  '#93c5fd': 'Sky Powder',
+  '#d8b4fe': 'Lilac Dream',
+  '#fdba74': 'Peach Glow',
+  '#f9a8d4': 'Cotton Candy',
+  // Level 3 reward-pool colors
+  '#eab308': 'Champion Gold',
+  '#0ea5e9': 'Sapphire Shine',
+  '#059669': 'Jade Legend',
+  '#7c3aed': 'Cosmic Violet',
+}
+
+const TRAIL_NAMES = {
+  // Level 2 reward-pool trails
+  '#fb923c': 'Sunset Streak',
+  '#4ade80': 'Emerald Streak',
+  '#38bdf8': 'Sky Streak',
+  '#f472b6': 'Bubblegum Streak',
+  '#a78bfa': 'Violet Streak',
+  '#22d3ee': 'Aqua Streak',
+  '#fbbf24': 'Amber Streak',
+  // Level 3 reward-pool trails
+  '#f43f5e': 'Ruby Blaze',
+  '#a855f7': 'Amethyst Rush',
+  '#db2777': 'Magenta Comet',
+  '#f59e0b': 'Solar Flare',
 }
 
 export function LobbyUI() {
@@ -263,7 +291,7 @@ export function LobbyUI() {
                         cursor: 'pointer',
                       }}
                     >
-                      {trail}
+                      {TRAIL_NAMES[trail] || trail}
                     </button>
                   ))}
                 </div>

@@ -267,17 +267,18 @@ export function OverlayUI() {
   const gameState = useGameStore((state) => state.gameState)
   const restart = useGameStore((state) => state.restart)
   const cognitiveStrikes = useGameStore((state) => state.cognitiveStrikes)
-  const targetWord = useGameStore((state) => state.targetWord)
+  const lastReward = useGameStore((state) => state.lastReward)
+  const rewardEventId = useGameStore((state) => state.rewardEventId)
 
   const [playDeath] = useDeathSound()
   const [playWrongLetter] = useWrongLetterSound()
   const [playWin] = useWinSound()
   const prevGameState = useRef(gameState)
   const prevStrikes = useRef(cognitiveStrikes)
-  const prevTargetWord = useRef(targetWord)
+  const prevRewardEventId = useRef(rewardEventId)
   const [flashRed, setFlashRed] = useState(false)
   const [wrongLetterMessage, setWrongLetterMessage] = useState(null)
-  const [celebrationMessage, setCelebrationMessage] = useState(null)
+  const [celebration, setCelebration] = useState(null)
 
   const flashRedTimeoutRef = useRef(null)
   const wrongLetterMessageTimeoutRef = useRef(null)
@@ -322,17 +323,22 @@ export function OverlayUI() {
     }
   }, [])
 
-  // Word completed celebration
+  // Word completed celebration — keyed off rewardEventId (bumped ONLY in
+  // gameStore's word-completion branch), not off targetWord changing. A
+  // cognitive-strike downgrade also changes targetWord without completing a
+  // word; watching targetWord directly (the old approach) fired this same
+  // "WORD COMPLETED! Reward Unlocked!" banner on a downgrade too, a false
+  // positive. rewardEventId only advances on an actual completion.
   useEffect(() => {
-    if (prevTargetWord.current && prevTargetWord.current !== targetWord && gameState === 'playing') {
+    if (rewardEventId !== prevRewardEventId.current && lastReward && gameState === 'playing') {
       playWin()
-      setCelebrationMessage(`🎉 WORD COMPLETED: ${prevTargetWord.current}! Reward Unlocked!`)
-      const timeout = setTimeout(() => setCelebrationMessage(null), 2500)
-      prevTargetWord.current = targetWord
+      setCelebration(lastReward)
+      const timeout = setTimeout(() => setCelebration(null), 3200)
+      prevRewardEventId.current = rewardEventId
       return () => clearTimeout(timeout)
     }
-    prevTargetWord.current = targetWord
-  }, [targetWord, gameState, playWin])
+    prevRewardEventId.current = rewardEventId
+  }, [rewardEventId, lastReward, gameState, playWin])
 
   return (
     <div style={{
@@ -342,6 +348,14 @@ export function OverlayUI() {
     }}>
       {gameState === 'playing' && (
         <>
+          <style>{`
+            @keyframes rewardPop {
+              0% { transform: scale(0.6); opacity: 0; }
+              60% { transform: scale(1.08); opacity: 1; }
+              100% { transform: scale(1); opacity: 1; }
+            }
+          `}</style>
+
           <WordProgressHUD />
 
           {/* Wrong Letter Alert Banner */}
@@ -364,27 +378,53 @@ export function OverlayUI() {
           )}
 
           {/* Celebration Banner */}
-          {celebrationMessage && (
+          {celebration && (
             <div style={{
               position: 'absolute',
-              top: '8rem',
-              backgroundColor: 'rgba(22, 163, 74, 0.95)',
+              top: '7rem',
+              backgroundColor: 'rgba(22, 163, 74, 0.97)',
               color: 'white',
-              padding: '1rem 2rem',
-              borderRadius: '1.2rem',
-              fontSize: '1.35rem',
-              fontWeight: 'bold',
-              boxShadow: '0 8px 30px rgba(0,0,0,0.6)',
+              padding: '1.2rem 2.4rem',
+              borderRadius: '1.4rem',
+              boxShadow: '0 12px 40px rgba(0,0,0,0.65), 0 0 0 6px rgba(134, 239, 172, 0.25)',
               border: '3px solid #86efac',
               textAlign: 'center',
               display: 'flex',
               flexDirection: 'column',
-              gap: '0.3rem',
-              animation: 'fadeIn 0.2s',
+              alignItems: 'center',
+              gap: '0.5rem',
+              animation: 'rewardPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
             }}>
-              <div>{celebrationMessage}</div>
-              <div style={{ fontSize: '0.95rem', color: '#bbf7d0', fontWeight: 'normal' }}>
-                ⭐ Added to your Mastered Trophy Shelf & Unlocked New Outfit!
+              <div style={{ fontSize: '1.4rem', fontWeight: 'bold' }}>
+                🎉 WORD COMPLETED: {celebration.word}!
+              </div>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.6rem',
+                background: 'rgba(0, 0, 0, 0.25)',
+                padding: '0.5rem 1rem',
+                borderRadius: '0.9rem',
+              }}>
+                <span style={{
+                  width: '1.6rem',
+                  height: '1.6rem',
+                  borderRadius: '50%',
+                  backgroundColor: celebration.value,
+                  border: '2px solid white',
+                  boxShadow: `0 0 14px ${celebration.value}`,
+                  flexShrink: 0,
+                }} />
+                <span style={{ fontSize: '1.05rem', fontWeight: 'bold' }}>
+                  {celebration.isNew
+                    ? `New ${celebration.type === 'trail' ? 'Trail' : 'Outfit'}: ${celebration.label}!`
+                    : `Bonus Remix: ${celebration.label}!`}
+                </span>
+              </div>
+              <div style={{ fontSize: '0.85rem', color: '#bbf7d0', fontWeight: 'normal' }}>
+                {celebration.isNew
+                  ? '⭐ Added to your Mastered Trophy Shelf & Outfit Closet!'
+                  : '⭐ Added to your Mastered Trophy Shelf — equipped as a fresh look!'}
               </div>
             </div>
           )}
