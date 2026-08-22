@@ -85,6 +85,17 @@ describe('applyCognitiveStrike', () => {
     expect(result.cognitiveStrikes).toBe(0)
     expect(vocabData.level_1.words).toContain(result.targetWord)
   })
+
+  it('stays in math mode on downgrade instead of falling back to English spelling', () => {
+    const result = applyCognitiveStrike(
+      { cognitiveStrikes: 2, currentTier: 'level_2' },
+      vocabData,
+      'math_basic'
+    )
+    expect(result.cognitiveStrikes).toBe(0)
+    expect(result.targetObjective.mode).toBe('math_basic')
+    expect(result.targetWord).toBe(result.targetObjective.display)
+  })
 })
 
 describe('pickReward', () => {

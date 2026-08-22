@@ -171,15 +171,16 @@ export const useGameStore = create(
           const currentVocab = getCurrentVocab(state.gameMode)
           const result = applyCognitiveStrike(
             { cognitiveStrikes: state.cognitiveStrikes, currentTier: state.currentTier },
-            currentVocab
+            currentVocab,
+            state.gameMode,
+            arabicVocabData
           )
           if (result.targetWord !== null) {
-            const normalizedDowngrade = normalizeObjective(result.targetWord)
             return {
               cognitiveStrikes: result.cognitiveStrikes,
               currentTier: result.currentTier,
-              targetObjective: normalizedDowngrade,
-              targetWord: normalizedDowngrade.display,
+              targetObjective: result.targetObjective,
+              targetWord: result.targetObjective.display,
               inventory: [],
             }
           }

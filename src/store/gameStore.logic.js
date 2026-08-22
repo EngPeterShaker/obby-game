@@ -207,7 +207,7 @@ export function pickNextObjective(mode, tier, masteredWords, vocabData, arabicVo
 
 const TIER_ORDER = ['level_1', 'level_2', 'level_3']
 
-export function applyCognitiveStrike(state, vocabData) {
+export function applyCognitiveStrike(state, vocabData, mode = 'spelling_en', arabicVocabData = null) {
   const newStrikes = state.cognitiveStrikes + 1
 
   if (newStrikes < 3) {
@@ -216,9 +216,9 @@ export function applyCognitiveStrike(state, vocabData) {
 
   const currentIndex = TIER_ORDER.indexOf(state.currentTier)
   const downgradedTier = currentIndex > 0 ? TIER_ORDER[currentIndex - 1] : TIER_ORDER[0]
-  const nextWord = pickNextWord(downgradedTier, [], vocabData)
+  const nextObjective = pickNextObjective(mode, downgradedTier, [], vocabData, arabicVocabData)
 
-  return { cognitiveStrikes: 0, currentTier: downgradedTier, targetWord: nextWord }
+  return { cognitiveStrikes: 0, currentTier: downgradedTier, targetWord: nextObjective.display, targetObjective: nextObjective }
 }
 
 export function getRewardPool(tier, vocabData) {
