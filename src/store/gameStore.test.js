@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { useGameStore } from './gameStore.js'
+import vocabData from '../data/vocabulary.json'
 
 describe('spawnInitialChunks', () => {
   beforeEach(() => {
@@ -102,10 +103,51 @@ describe('collectLetter', () => {
     expect(useGameStore.getState().masteredWords).not.toContain('CAT')
   })
 
-  it('applies the cosmetic reward on word completion', () => {
+  it("applies a cosmetic reward from the tier's pool on word completion", () => {
+    // This describe block's beforeEach seeds unlockedColors as ['hotpink'],
+    // which does not overlap the level_1 reward pool, so this is always a
+    // fresh unlock, not a duplicate re-push — assert relative to that
+    // starting length rather than a hardcoded absolute number.
+    const startingColors = useGameStore.getState().unlockedColors
     useGameStore.setState({ inventory: ['C', 'A'], cognitiveStrikes: 0 })
     useGameStore.getState().collectLetter('T')
-    expect(useGameStore.getState().unlockedColors).toContain('blue')
-    expect(useGameStore.getState().equippedColor).toBe('blue')
+    const state = useGameStore.getState()
+    const poolValues = vocabData.level_1.rewardPool.map((r) => r.value)
+    expect(poolValues).toContain(state.equippedColor)
+    expect(state.unlockedColors).toContain(state.equippedColor)
+    expect(state.unlockedColors).toHaveLength(startingColors.length + 1)
+  })
+
+  it('does not grow unlockedColors once the whole tier reward pool is already owned', () => {
+    const allPoolValues = vocabData.level_1.rewardPool.map((r) => r.value)
+    const currentColors = useGameStore.getState().unlockedColors
+    useGameStore.setState({ unlockedColors: [...currentColors, ...allPoolValues] })
+    useGameStore.setState({ inventory: ['C', 'A'], cognitiveStrikes: 0 })
+    useGameStore.getState().collectLetter('T')
+    const state = useGameStore.getState()
+    // Pool exhausted -> pickReward returns isNew: false -> no push, just a
+    // re-equip.
+    expect(state.unlockedColors).toHaveLength(currentColors.length + allPoolValues.length)
+    expect(allPoolValues).toContain(state.equippedColor)
+  })
+
+  it('records lastReward and bumps rewardEventId on real word completion', () => {
+    useGameStore.setState({ inventory: ['C', 'A'], cognitiveStrikes: 0, rewardEventId: 0 })
+    useGameStore.getState().collectLetter('T')
+    const state = useGameStore.getState()
+    expect(state.rewardEventId).toBe(1)
+    expect(state.lastReward).toMatchObject({ word: 'CAT', isNew: true })
+  })
+
+  it('does NOT bump rewardEventId on a cognitive-strike downgrade (no reward granted)', () => {
+    useGameStore.setState({
+      inventory: [], targetWord: 'CAT', currentTier: 'level_2',
+      cognitiveStrikes: 2, rewardEventId: 0, lastReward: null,
+    })
+    useGameStore.getState().collectLetter('X') // decoy -> 3rd strike -> downgrade, not a completion
+    const state = useGameStore.getState()
+    expect(state.currentTier).toBe('level_1') // downgrade did happen
+    expect(state.rewardEventId).toBe(0) // but no reward event fired
+    expect(state.lastReward).toBeNull()
   })
 })

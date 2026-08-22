@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { getChunkWeights, pickChunkType, applyCognitiveStrike, pickNextWord, getTierRewardAction, pickLetterForChunk, getEffectiveVocabulary } from './gameStore.logic.js'
+import { getChunkWeights, pickChunkType, applyCognitiveStrike, pickNextWord, pickReward, pickLetterForChunk, getEffectiveVocabulary } from './gameStore.logic.js'
 import vocabData from '../data/vocabulary.json'
 import { useCustomWordsStore } from './customWordsStore.js'
 
@@ -41,6 +41,14 @@ export const useGameStore = create(
   masteredWords: [],
   sessionCoins: 0,
   totalCoins: 0,
+
+  // Transient, session-only celebration data (never persisted). `lastReward`
+  // describes the reward actually granted on the most recent word
+  // completion; `rewardEventId` is a monotonic counter OverlayUI watches to
+  // trigger the celebration exactly once per real completion — it must NOT
+  // be bumped on a cognitive-downgrade targetWord change (see collectLetter).
+  lastReward: null,
+  rewardEventId: 0,
 
   // Persistent cosmetic state (persist wiring added in Task 8)
   unlockedColors: [
@@ -157,10 +165,23 @@ export const useGameStore = create(
         : state.masteredWords
 
       const currentVocab = getCurrentVocab()
-      const reward = getTierRewardAction(state.currentTier, currentVocab)
+      const reward = pickReward(
+        state.currentTier,
+        { colors: state.unlockedColors, trails: state.unlockedTrails },
+        currentVocab
+      )
+      // Only push into the unlocked array on a genuinely new reward — once a
+      // tier's whole pool is owned, `pickReward` returns isNew: false and we
+      // just re-equip an already-owned item instead of adding a duplicate.
       const rewardPatch = reward.type === 'color'
-        ? { unlockedColors: [...state.unlockedColors, reward.value], equippedColor: reward.value }
-        : { unlockedTrails: [...state.unlockedTrails, reward.value], equippedTrail: reward.value }
+        ? {
+            unlockedColors: reward.isNew ? [...state.unlockedColors, reward.value] : state.unlockedColors,
+            equippedColor: reward.value,
+          }
+        : {
+            unlockedTrails: reward.isNew ? [...state.unlockedTrails, reward.value] : state.unlockedTrails,
+            equippedTrail: reward.value,
+          }
 
       const nextWord = pickNextWord(state.currentTier, newMastered, currentVocab)
 
@@ -170,6 +191,8 @@ export const useGameStore = create(
         mechanicalDeaths: 0,
         masteredWords: newMastered,
         targetWord: nextWord,
+        lastReward: { word: state.targetWord, ...reward },
+        rewardEventId: state.rewardEventId + 1,
         ...rewardPatch,
       }
     }
