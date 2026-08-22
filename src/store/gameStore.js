@@ -91,6 +91,7 @@ export const useGameStore = create(
       // Transient physics-loop state
       playerZ: 0,
       activeChunks: [],
+      respawnTimeMs: 0,
 
       // Actions
       setGameMode: (mode) => {
@@ -115,7 +116,7 @@ export const useGameStore = create(
       })),
 
       restart: () => {
-        set({ gameState: 'playing', inventory: [], playerZ: 0 })
+        set({ gameState: 'playing', inventory: [], playerZ: 0, respawnTimeMs: performance.now() })
         get().spawnInitialChunks()
       },
 
@@ -248,6 +249,7 @@ export const useGameStore = create(
           targetWord: normalized.display,
           playerZ: 0,
           cognitiveStrikes: 0,
+          respawnTimeMs: performance.now(),
         })
         get().spawnInitialChunks()
       },

@@ -57,8 +57,11 @@ function RoadCrossingDuck({ zInitial, speed = 2.2, minX = -3.8, maxX = 3.8, phas
     if (leftFootRef.current) leftFootRef.current.rotation.x = footStep
     if (rightFootRef.current) rightFootRef.current.rotation.x = -footStep
 
-    // Collision detection: player walking or running into the duck
-    if (gameState === 'playing') {
+    // Collision detection: player walking or running into the duck.
+    // Gated by the same post-respawn grace period as the fall-death check
+    // (Player.jsx) so respawning next to a duck can't immediately re-kill.
+    const respawnTimeMs = useGameStore.getState().respawnTimeMs || 0
+    if (gameState === 'playing' && performance.now() - respawnTimeMs > 800) {
       const distZ = Math.abs(zPosRef.current - playerZ)
       if (distZ < 1.25) {
         // Player hitbox check: center (0, y, playerZ)
