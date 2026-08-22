@@ -282,6 +282,7 @@ export function OverlayUI() {
 
   const flashRedTimeoutRef = useRef(null)
   const wrongLetterMessageTimeoutRef = useRef(null)
+  const celebrationTimeoutRef = useRef(null)
 
   // Death sound
   useEffect(() => {
@@ -320,6 +321,7 @@ export function OverlayUI() {
     return () => {
       if (flashRedTimeoutRef.current) clearTimeout(flashRedTimeoutRef.current)
       if (wrongLetterMessageTimeoutRef.current) clearTimeout(wrongLetterMessageTimeoutRef.current)
+      if (celebrationTimeoutRef.current) clearTimeout(celebrationTimeoutRef.current)
     }
   }, [])
 
@@ -333,9 +335,8 @@ export function OverlayUI() {
     if (rewardEventId !== prevRewardEventId.current && lastReward && gameState === 'playing') {
       playWin()
       setCelebration(lastReward)
-      const timeout = setTimeout(() => setCelebration(null), 3200)
-      prevRewardEventId.current = rewardEventId
-      return () => clearTimeout(timeout)
+      if (celebrationTimeoutRef.current) clearTimeout(celebrationTimeoutRef.current)
+      celebrationTimeoutRef.current = setTimeout(() => setCelebration(null), 3200)
     }
     prevRewardEventId.current = rewardEventId
   }, [rewardEventId, lastReward, gameState, playWin])
@@ -381,7 +382,7 @@ export function OverlayUI() {
           {celebration && (
             <div style={{
               position: 'absolute',
-              top: '7rem',
+              top: '11rem',
               backgroundColor: 'rgba(22, 163, 74, 0.97)',
               color: 'white',
               padding: '1.2rem 2.4rem',
