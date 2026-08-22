@@ -8,9 +8,7 @@ import { OverlayUI } from './components/OverlayUI.jsx'
 import { LevelManager } from './components/LevelManager.jsx'
 import { ShowcasePlayer } from './components/ShowcasePlayer.jsx'
 import { LobbyUI } from './components/LobbyUI.jsx'
-import { ControlsModal } from './components/ControlsModal.jsx'
-import { SettingsModal } from './components/SettingsModal.jsx'
-import { WordAdminPanel } from './components/WordAdminPanel.jsx'
+import { TopMenu } from './components/TopMenu.jsx'
 import { SkyHazards } from './components/SkyHazards.jsx'
 import { LandscapeGuard } from './components/LandscapeGuard.jsx'
 import { AdaptiveCameraScaler } from './components/AdaptiveCameraScaler.jsx'
@@ -92,9 +90,7 @@ export default function App() {
       <LobbyUI />
       <OverlayUI />
       <TouchSwipeController />
-      <SettingsModal />
-      <ControlsModal />
-      <WordAdminPanel />
+      <TopMenu />
       <SplashScreen />
     </div>
   )
