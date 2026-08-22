@@ -69,7 +69,7 @@ export default function App() {
   const gameState = useGameStore((state) => state.gameState)
 
   return (
-    <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+    <div style={{ width: '100vw', height: '100dvh', position: 'relative' }}>
       <LandscapeGuard />
       <KeyboardControls map={keyboardMap}>
         <Canvas camera={{ position: [0, 5, 10], fov: 50 }} shadows>

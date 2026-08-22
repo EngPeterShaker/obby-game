@@ -279,6 +279,8 @@ export function LobbyUI() {
             border: `2px solid ${currentModeInfo.color}`,
             boxShadow: '0 12px 36px rgba(0, 0, 0, 0.6)',
             width: '100%',
+            maxHeight: 'calc(100dvh - 12rem)',
+            overflowY: 'auto',
             animation: 'fadeIn 0.15s ease',
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
@@ -355,7 +357,7 @@ export function LobbyUI() {
             border: '2px solid #38bdf8',
             boxShadow: '0 12px 36px rgba(0, 0, 0, 0.6)',
             width: '100%',
-            maxHeight: 'calc(100vh - 12rem)',
+            maxHeight: 'calc(100dvh - 12rem)',
             overflowY: 'auto',
             animation: 'fadeIn 0.15s ease',
           }}>
@@ -447,6 +449,8 @@ export function LobbyUI() {
             border: `2px solid ${currentLevelInfo.color}`,
             boxShadow: '0 12px 36px rgba(0, 0, 0, 0.6)',
             width: '100%',
+            maxHeight: 'calc(100dvh - 12rem)',
+            overflowY: 'auto',
             animation: 'fadeIn 0.15s ease',
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
@@ -520,7 +524,7 @@ export function LobbyUI() {
             border: '2px solid #fbbf24',
             boxShadow: '0 12px 36px rgba(0, 0, 0, 0.6)',
             width: '100%',
-            maxHeight: 'calc(100vh - 12rem)',
+            maxHeight: 'calc(100dvh - 12rem)',
             overflowY: 'auto',
             animation: 'fadeIn 0.15s ease',
           }}>
